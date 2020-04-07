@@ -1,13 +1,24 @@
 package com.snowplowanalytics.ci.modules
 
 import io.circe._
-import io.circe.literal._
+import io.circe.generic.extras.Configuration
+import io.circe.generic.extras.semiauto._
 import sttp.client._
 import sttp.client.circe._
 import sttp.client.asynchttpclient.zio.SttpClient
 import zio._
 
 object JwtProvider {
+  case class JwtRequest(clientId: String,
+                        clientSecret: String,
+                        audience: String,
+                        grantType: String,
+                        username: String,
+                        password: String)
+
+  implicit val customConfig: Configuration = Configuration.default.withSnakeCaseMemberNames
+  implicit val snakyEncoder: Encoder[JwtRequest] = deriveConfiguredEncoder
+
   def getAccessToken(
       authServerBaseUrl: String,
       clientId: String,
@@ -17,18 +28,7 @@ object JwtProvider {
       password: String
   ): RIO[SttpClient, String] = {
     val request = basicRequest
-      .body(
-        json"""
-          {
-            "client_id": ${clientId},
-            "client_secret": ${clientSecret},
-            "audience": ${audience},
-            "grant_type": "password",
-            "username": ${username},
-            "password": ${password}
-          }
-          """
-      )
+      .body(JwtRequest(clientId, clientSecret, audience, "password", username, password))
       .post(uri"${authServerBaseUrl}/oauth/token")
       .response(asJsonAlways[Json])
 

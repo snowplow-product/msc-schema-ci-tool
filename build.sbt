@@ -6,11 +6,9 @@ lazy val root = (project in file("."))
     organization := "com.snowplowanalytics",
     name := "schema-ci",
     version := "0.1.0",
-    scalaVersion := "2.13.1",
+    scalaVersion := "2.12.11",
     libraryDependencies ++= Build.dependencies,
     onLoadMessage := Build.welcomeMessage,
-    resolvers += "jitpack".at("https://jitpack.io"),
-    testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework")),
     onChangedBuildSource := ReloadOnSourceChanges
   )
   .enablePlugins(

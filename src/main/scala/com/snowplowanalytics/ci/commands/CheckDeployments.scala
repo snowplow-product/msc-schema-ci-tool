@@ -3,7 +3,7 @@ package com.snowplowanalytics.ci.commands
 import cats.data.NonEmptyList
 import cats.implicits._
 import com.snowplowanalytics.ci.Commands.{CliTask, URL, UUID}
-import com.snowplowanalytics.ci.modules.Json.extractUsedSchemasFromManifest
+import com.snowplowanalytics.ci.modules.JsonProvider.extractUsedSchemasFromManifest
 import com.snowplowanalytics.ci.modules.JwtProvider.getAccessToken
 import com.snowplowanalytics.ci.modules.SchemaApiClient.{checkSchemaDeployment, Schema}
 import sttp.client.asynchttpclient.zio.SttpClient
@@ -44,7 +44,7 @@ object CheckDeployments {
           .map(
             schema =>
               checkSchemaDeployment(apiBaseUrl, token, organizationId, environment, schema)
-                .map(found => Option.when(!found)(schema))
+                .map(found => Option(schema).filter(_ => !found))
           )
       )
       .flatMap(

@@ -9,13 +9,12 @@ import zio._
 import scala.io.{BufferedSource, Source}
 
 object Json {
-
   def extractUsedSchemasFromManifest(path: String): Task[List[Schema.Metadata]] =
     readFileToString(path) >>= parseJson >>= validateSelfDescribingJsonAndExtractData >>= getUsedSchemas
 
   private def readFileToString(path: String): Task[String] = {
     val openFile: String => Task[BufferedSource] = path => Task.effect(Source.fromFile(path, "UTF-8"))
-    val closeFile: BufferedSource => UIO[Unit] = bs => Task.effect(bs.close()).ignore
+    val closeFile: BufferedSource => UIO[Unit]   = bs => Task.effect(bs.close()).ignore
 
     openFile(path).bracket(closeFile) { file =>
       Task.effect(file.getLines.mkString)

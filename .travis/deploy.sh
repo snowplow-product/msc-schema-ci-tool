@@ -1,22 +1,16 @@
 #!/bin/bash
 
-tag_version=$1
+set -e
 
-mkdir ~/.bintray/
-file=$HOME/.bintray/.credentials
-cat <<EOF >$file
-realm = Bintray API Realm
-host = api.bintray.com
-user = $BINTRAY_SNOWPLOW_MAVEN_USER
-password = $BINTRAY_SNOWPLOW_MAVEN_API_KEY
-EOF
+tag=$1
 
-cd $TRAVIS_BUILD_DIR
+cd "${TRAVIS_BUILD_DIR}"
+export TRAVIS_BUILD_RELEASE_TAG="${tag}"
+release-manager \
+    --config "./.travis/release.yml" \
+    --check-version \
+    --make-version \
+    --make-artifact \
+    --upload-artifact
 
-project_version=$(sbt version -Dsbt.log.noformat=true | perl -ne 'print $1 if /(\d+\.\d+\.\d+[^\r\n]*)/')
-if [ "${project_version}" == "${tag_version}" ]; then
-    sbt +publish
-else
-    echo "Tag version '${tag_version}' doesn't match version in scala project ('${project_version}'). Aborting!"
-    exit 1
-fi
+echo "DEPLOY: schema-ci deployed..."

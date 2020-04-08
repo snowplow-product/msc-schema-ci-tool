@@ -1,11 +1,10 @@
 addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
-addCommandAlias("check", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
-addCommandAlias("packageJar", "assembly")
+addCommandAlias("checkfmt", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
 
 lazy val root = (project in file("."))
   .settings(
     organization := "com.snowplowanalytics",
-    name := "msc-ci-tool",
+    name := "schema-ci",
     version := "0.1.0",
     scalaVersion := "2.13.1",
     libraryDependencies ++= Build.dependencies,
@@ -34,4 +33,3 @@ lazy val root = (project in file("."))
     },
     addArtifact(artifact in (Compile, assembly), assembly)
   )
-  .settings(Build.publishSettings)

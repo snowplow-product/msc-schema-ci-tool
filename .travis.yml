@@ -1,0 +1,15 @@
+language: scala
+scala:
+  - 2.12.11
+jdk:
+  - openjdk11
+
+script:
+  - sbt +test
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: ".travis/deploy.sh $TRAVIS_TAG"
+    on:
+      tags: true

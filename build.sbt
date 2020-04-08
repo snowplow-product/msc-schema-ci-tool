@@ -34,3 +34,4 @@ lazy val root = (project in file("."))
     },
     addArtifact(artifact in (Compile, assembly), assembly)
   )
+  .settings(Build.publishSettings)

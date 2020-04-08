@@ -1,5 +1,8 @@
+import bintray.BintrayPlugin._
+import bintray.BintrayKeys._
 import sbt._
 import sbt.librarymanagement.ModuleID
+import Keys._
 
 object Build {
   object Versions {
@@ -49,4 +52,11 @@ object Build {
         |${item("packageJar")}    - Package the app as a fat JAR
       """.stripMargin
   }
+
+  // Bintray publishing settings
+  lazy val publishSettings: Seq[Setting[_]] = bintraySettings ++ Seq[Setting[_]](
+    licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html")),
+    bintrayOrganization := Some("snowplow"),
+    bintrayRepository := "snowplow-maven"
+  )
 }

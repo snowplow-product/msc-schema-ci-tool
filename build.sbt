@@ -11,23 +11,5 @@ lazy val root = (project in file("."))
     onLoadMessage := Build.welcomeMessage,
     onChangedBuildSource := ReloadOnSourceChanges
   )
-  .enablePlugins(
-    ScalafmtPlugin
-  )
-  .settings(
-    assemblyJarName in assembly := s"${name.value}-${version.value}.jar",
-    crossPaths := false,
-    test in assembly := {},
-    assemblyMergeStrategy in assembly := {
-      case PathList("META-INF", _*) => MergeStrategy.discard
-      case _                        => MergeStrategy.first
-    },
-    publishArtifact in (Compile, packageBin) := false,
-    publishArtifact in (Compile, packageDoc) := false,
-    publishArtifact in (Compile, packageSrc) := false,
-    artifact in (Compile, assembly) := {
-      val previous: Artifact = (artifact in (Compile, assembly)).value
-      previous.withClassifier(Some("assembly"))
-    },
-    addArtifact(artifact in (Compile, assembly), assembly)
-  )
+  .enablePlugins(ScalafmtPlugin)
+  .settings(Build.sbtAssemblySettings)

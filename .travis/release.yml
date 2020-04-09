@@ -29,4 +29,4 @@ packages:
 
         # The binaries to put in the zip
         binary_paths:
-          - target/schema-ci-<%= ENV['TRAVIS_TAG'] %>.jar
+          - target/schema-ci

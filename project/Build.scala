@@ -1,5 +1,8 @@
+import sbtassembly.AssemblyPlugin.autoImport._
+import sbtassembly.AssemblyPlugin.defaultShellScript
 import sbt._
 import sbt.librarymanagement.ModuleID
+import sbt.Keys.{crossPaths, mainClass, name, test}
 
 object Build {
   object Versions {
@@ -30,6 +33,7 @@ object Build {
     "com.snowplowanalytics"        %% "iglu-scala-client"             % Versions.igluClient,
     "dev.zio"                      %% "zio-test"                      % Versions.zio % "test",
     "dev.zio"                      %% "zio-test-sbt"                  % Versions.zio % "test",
+    "org.slf4j"                    % "slf4j-nop"                      % "1.7.30",
     compilerPlugin("org.typelevel" %% "kind-projector"     % "0.11.0" cross CrossVersion.full),
     compilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1")
   )
@@ -47,4 +51,16 @@ object Build {
         |${item("assembly")}      - Package the app as a fat JAR
       """.stripMargin
   }
+
+  lazy val sbtAssemblySettings: Seq[Setting[_]] = Seq(
+    assemblyJarName in assembly := { name.value },
+    mainClass in assembly := Some("com.snowplowanalytics.ci.Main"),
+    assemblyOption in assembly ~= { _.copy(prependShellScript = Some(defaultShellScript)) },
+    crossPaths := false,
+    test in assembly := {},
+    assemblyMergeStrategy in assembly := {
+      case PathList("META-INF", _*) => MergeStrategy.discard
+      case _                        => MergeStrategy.first
+    }
+  )
 }

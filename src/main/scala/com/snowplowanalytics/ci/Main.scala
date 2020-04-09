@@ -9,8 +9,8 @@ object Main extends App {
     Commands.mainCommand
       .parse(args, sys.env)
       .fold(
-        help => putStrLn(help.toString()) *> UIO.succeed(if (help.errors.isEmpty) 0 else 1),
-        _.catchAll(t => putStrLn(t.getMessage) *> UIO.succeed(1)) *> UIO.succeed(0)
+        help => putStrLn(help.toString()).as(if (help.errors.isEmpty) 0 else 1),
+        _.as(0).catchAll(t => putStrLn(t.getMessage).as(1))
       )
       .provideCustomLayer(AsyncHttpClientZioBackend.layer().orDie)
 }

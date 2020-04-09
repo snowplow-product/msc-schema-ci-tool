@@ -1,4 +1,4 @@
-package com.snowplowanalytics.ci.modules
+package com.snowplowanalytics.schemaci.modules
 
 import io.circe._
 import io.circe.generic.extras.Configuration

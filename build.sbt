@@ -9,7 +9,8 @@ lazy val root = (project in file("."))
     scalaVersion := "2.12.11",
     libraryDependencies ++= Build.dependencies,
     onLoadMessage := Build.welcomeMessage,
-    onChangedBuildSource := ReloadOnSourceChanges
+    onChangedBuildSource := ReloadOnSourceChanges,
+    resolvers += Resolver.bintrayRepo("snowplow", "snowplow-maven")
   )
   .enablePlugins(ScalafmtPlugin)
   .settings(Build.sbtAssemblySettings)

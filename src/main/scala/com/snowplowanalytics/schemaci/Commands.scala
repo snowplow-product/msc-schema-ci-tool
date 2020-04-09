@@ -1,9 +1,9 @@
-package com.snowplowanalytics.ci
+package com.snowplowanalytics.schemaci
 
 import cats.implicits._
 import com.monovore.decline.{Command, Opts}
 import com.monovore.decline.refined._
-import com.snowplowanalytics.ci.commands.CheckDeployments
+import com.snowplowanalytics.schemaci.commands.CheckDeployments
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
 import eu.timepit.refined.string._

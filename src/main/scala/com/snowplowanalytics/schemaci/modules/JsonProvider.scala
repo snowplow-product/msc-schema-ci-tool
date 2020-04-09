@@ -1,7 +1,7 @@
-package com.snowplowanalytics.ci.modules
+package com.snowplowanalytics.schemaci.modules
 
 import cats.implicits._
-import com.snowplowanalytics.ci.modules.SchemaApiClient.Schema
+import com.snowplowanalytics.schemaci.modules.SchemaApiClient.Schema
 import com.snowplowanalytics.iglu.client.{CirceValidator, Client, Resolver}
 import com.snowplowanalytics.iglu.client.resolver.registries.Registry.{parse => _, _}
 import com.snowplowanalytics.iglu.core.SelfDescribingData

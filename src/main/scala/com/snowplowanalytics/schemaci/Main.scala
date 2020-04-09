@@ -1,4 +1,4 @@
-package com.snowplowanalytics.ci
+package com.snowplowanalytics.schemaci
 
 import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
 import zio._

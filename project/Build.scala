@@ -12,7 +12,7 @@ object Build {
     val sttp       = "2.0.7"
     val circe      = "0.13.0"
     val decline    = "1.0.0"
-    val igluClient = "0.6.2"
+    val igluClient = "1.0.0-rc1"
   }
 
   val dependencies: Seq[ModuleID] = Seq(
@@ -54,7 +54,7 @@ object Build {
 
   lazy val sbtAssemblySettings: Seq[Setting[_]] = Seq(
     assemblyJarName in assembly := { name.value },
-    mainClass in assembly := Some("com.snowplowanalytics.ci.Main"),
+    mainClass in assembly := Some("com.snowplowanalytics.schemaci.Main"),
     assemblyOption in assembly ~= { _.copy(prependShellScript = Some(defaultShellScript)) },
     crossPaths := false,
     test in assembly := {},

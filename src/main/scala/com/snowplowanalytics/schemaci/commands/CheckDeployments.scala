@@ -1,11 +1,11 @@
-package com.snowplowanalytics.ci.commands
+package com.snowplowanalytics.schemaci.commands
 
 import cats.data.NonEmptyList
 import cats.implicits._
-import com.snowplowanalytics.ci.Commands.{CliTask, URL, UUID}
-import com.snowplowanalytics.ci.modules.JsonProvider.extractUsedSchemasFromManifest
-import com.snowplowanalytics.ci.modules.JwtProvider.getAccessToken
-import com.snowplowanalytics.ci.modules.SchemaApiClient.{checkSchemaDeployment, Schema}
+import com.snowplowanalytics.schemaci.Commands.{CliTask, URL, UUID}
+import com.snowplowanalytics.schemaci.modules.JsonProvider.extractUsedSchemasFromManifest
+import com.snowplowanalytics.schemaci.modules.JwtProvider.getAccessToken
+import com.snowplowanalytics.schemaci.modules.SchemaApiClient.{checkSchemaDeployment, Schema}
 import sttp.client.asynchttpclient.zio.SttpClient
 import zio._
 import zio.console._

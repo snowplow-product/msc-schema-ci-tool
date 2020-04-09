@@ -1,10 +1,10 @@
-package com.snowplowanalytics.ci.modules
+package com.snowplowanalytics.schemaci.modules
 
 import java.security.MessageDigest
 
 import cats.implicits._
 import cats.data.ValidatedNel
-import com.snowplowanalytics.ci.modules.SchemaApiClient.Schema._
+import com.snowplowanalytics.schemaci.modules.SchemaApiClient.Schema._
 import io.circe._
 import io.circe.generic.auto._
 import sttp.client._

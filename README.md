@@ -6,8 +6,7 @@
 Schema CI is a command-line tool which allows you to integrate Schema API into your CI/CD pipelines.  
 Currently, it supports one common task:
 
-* Verifying that all schema dependencies (declared in a specific "manifest") are already deployed into 
-an environment (e.g. "DEV", "PROD")
+* Verifying that all schema dependencies for a project are already deployed into an environment (e.g. "DEV", "PROD")
 
 ## Prerequisites
 
@@ -24,14 +23,14 @@ curl -L "http://dl.bintray.com/snowplow/snowplow-generic/schema-ci-0.1.0.zip" | 
 In order to be able to perform any task, you need to obtain some credentials and some details for the tool 
 to be able to interact with Schema API. These credentials come in form of an organization id (uuid) and OAuth2 
 client id, client secret, audience, username and password.  
-Refer to [Data Workflow team on Slack](slack://channel?id=CDBKK3LCR&team=T0A28T6MN) on how to obtain them.
+Refer to [Data Workflow team on Slack](https://appurl.io/Wb0tgBlFO) on how to obtain them.
 
 ## CLI
 
 ### Check Deployments
 
-This command allow to verify that all schema dependencies (declared in a specific "manifest") are already deployed into 
-an environment (e.g. "DEV", "PROD")
+This command allow to verify that all schema dependencies for a project (declared in a specific "manifest") 
+are already deployed into an environment (e.g. "DEV", "PROD")
 
 Syntax: 
 ```bash

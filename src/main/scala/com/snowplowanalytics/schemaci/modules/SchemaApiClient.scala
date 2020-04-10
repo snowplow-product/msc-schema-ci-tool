@@ -1,11 +1,12 @@
-package com.snowplowanalytics.ci.modules
+package com.snowplowanalytics.schemaci.modules
 
 import java.security.MessageDigest
 
 import cats.implicits._
 import cats.data.ValidatedNel
+import com.snowplowanalytics.schemaci.modules.SchemaApiClient.Schema._
 import io.circe._
-import io.circe.literal._
+import io.circe.generic.auto._
 import sttp.client._
 import sttp.client.circe._
 import sttp.client.asynchttpclient.zio.SttpClient
@@ -13,6 +14,8 @@ import zio.RIO
 
 object SchemaApiClient {
   object Schema {
+    case class Meta(hidden: Boolean, schemaType: String, customData: Json)
+    case class ValidationRequest(meta: Meta, data: Json)
     case class Metadata(vendor: String, name: String, format: String, version: String)
   }
 
@@ -26,18 +29,7 @@ object SchemaApiClient {
       .send(
         basicRequest.auth
           .bearer(token)
-          .body(
-            json"""
-            {
-              "meta": {
-                "hidden": false,
-                "schemaType": "event",
-                "customData": {}
-              },
-              "data": $schema
-            }
-            """
-          )
+          .body(ValidationRequest(Meta(false, "entity", Json.fromJsonObject(JsonObject.empty)), schema))
           .post(uri"$apiBaseUrl/api/schemas/v1/organizations/$organizationId/validation-requests/sync")
           .response(asJson[Json])
       )

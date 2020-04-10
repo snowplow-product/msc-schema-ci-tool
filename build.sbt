@@ -5,31 +5,14 @@ lazy val root = (project in file("."))
   .settings(
     organization := "com.snowplowanalytics",
     name := "schema-ci",
+    description := "A CLI helper tool for common CI/CD scenarios when developing Snowplow Schemas",
     version := "0.1.0",
-    scalaVersion := "2.13.1",
+    scalaVersion := "2.12.11",
     libraryDependencies ++= Build.dependencies,
     onLoadMessage := Build.welcomeMessage,
-    resolvers += "jitpack".at("https://jitpack.io"),
-    testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework")),
-    onChangedBuildSource := ReloadOnSourceChanges
+    onChangedBuildSource := ReloadOnSourceChanges,
+    resolvers += Resolver.bintrayRepo("snowplow", "snowplow-maven")
   )
-  .enablePlugins(
-    ScalafmtPlugin
-  )
-  .settings(
-    assemblyJarName in assembly := s"${name.value}-${version.value}.jar",
-    crossPaths := false,
-    test in assembly := {},
-    assemblyMergeStrategy in assembly := {
-      case PathList("META-INF", _*) => MergeStrategy.discard
-      case _                        => MergeStrategy.first
-    },
-    publishArtifact in (Compile, packageBin) := false,
-    publishArtifact in (Compile, packageDoc) := false,
-    publishArtifact in (Compile, packageSrc) := false,
-    artifact in (Compile, assembly) := {
-      val previous: Artifact = (artifact in (Compile, assembly)).value
-      previous.withClassifier(Some("assembly"))
-    },
-    addArtifact(artifact in (Compile, assembly), assembly)
-  )
+  .enablePlugins(ScalafmtPlugin, BuildInfoPlugin)
+  .settings(Build.sbtAssemblySettings)
+  .settings(Build.sbtBuildInfoSettings)

@@ -20,6 +20,7 @@ cache:
     - $HOME/.sbt
 
 before_deploy:
+  - sudo python -m easy_install --upgrade pyOpenSSL # https://stackoverflow.com/questions/43267157/python-attributeerror-module-object-has-no-attribute-ssl-st-init
   - pip install --user release-manager==0.4.1
 deploy:
   - provider: script

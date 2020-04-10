@@ -2,7 +2,7 @@
   "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
   "description": "Schema for recording schema dependencies",
   "self": {
-    "vendor": "com.snowplowanalytics.snowplow",
+    "vendor": "com.snowplowanalytics.schemaci",
     "name": "schema_dependencies",
     "format": "jsonschema",
     "version": "1-0-0"

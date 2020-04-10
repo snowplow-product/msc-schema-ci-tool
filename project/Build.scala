@@ -2,7 +2,8 @@ import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.AssemblyPlugin.defaultShellScript
 import sbt._
 import sbt.librarymanagement.ModuleID
-import sbt.Keys.{crossPaths, mainClass, name, test}
+import sbt.Keys._
+import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 object Build {
   object Versions {
@@ -11,7 +12,7 @@ object Build {
     val catsEffect = "2.0.0"
     val sttp       = "2.0.7"
     val circe      = "0.13.0"
-    val decline    = "1.0.0"
+    val decline    = "1.2.0"
     val igluClient = "1.0.0-rc1"
   }
 
@@ -62,5 +63,10 @@ object Build {
       case PathList("META-INF", _*) => MergeStrategy.discard
       case _                        => MergeStrategy.first
     }
+  )
+
+  lazy val sbtBuildInfoSettings: Seq[Setting[_]] = Seq(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, description),
+    buildInfoPackage := "com.snowplowanalytics.schemaci"
   )
 }

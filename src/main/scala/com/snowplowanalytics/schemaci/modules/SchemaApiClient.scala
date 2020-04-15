@@ -2,15 +2,16 @@ package com.snowplowanalytics.schemaci.modules
 
 import java.security.MessageDigest
 
-import cats.implicits._
 import cats.data.ValidatedNel
+import cats.implicits._
 import com.snowplowanalytics.schemaci.entities.Schema
 import io.circe._
 import io.circe.generic.auto._
 import sttp.client._
-import sttp.client.circe._
 import sttp.client.asynchttpclient.zio.SttpClient
-import zio.RIO
+import sttp.client.circe._
+import sttp.model.Uri
+import zio.{RIO, ZIO}
 
 object SchemaApiClient {
   def validateSchema(
@@ -47,21 +48,34 @@ object SchemaApiClient {
       organizationId: String,
       environment: String,
       schemaMetadata: Schema.Metadata
-  ): RIO[SttpClient, Boolean] =
-    SttpClient
-      .send(
-        basicRequest.auth
-          .bearer(token)
-          .post(
-            uri"$apiBaseUrl/api/schemas/v1/organizations/$organizationId/schemas/${computeSchemaHash(organizationId, schemaMetadata)}/deployments?env=$environment&version=${schemaMetadata.version}"
-          )
-          .response(asJson[Json])
+  ): RIO[SttpClient, Boolean] = {
+    val basePath               = "api/schemas/v1"
+    val organizations          = s"organizations/$organizationId"
+    val schemas                = s"schemas/${computeSchemaHash(organizationId, schemaMetadata)}"
+    val deploymentsWithFilters = s"deployments?env=$environment&version=${schemaMetadata.version}"
+
+    ZIO
+      .effect(
+        Uri
+          .parse(s"$apiBaseUrl/$basePath/$organizations/$schemas/$deploymentsWithFilters")
+          .leftMap(new RuntimeException(_))
       )
+      .absolve
+      .flatMap { uri =>
+        SttpClient
+          .send(
+            basicRequest.auth
+              .bearer(token)
+              .post(uri)
+              .response(asJson[Json])
+          )
+      }
       .map(_.body)
       .absolve
       .map(_.hcursor.as[List[Json]])
       .absolve
       .map(_.nonEmpty)
+  }
 
   private def computeSchemaHash(organizationId: String, meta: Schema.Metadata): String =
     MessageDigest

@@ -1,7 +1,7 @@
 package com.snowplowanalytics.schemaci.modules
 
 import cats.implicits._
-import com.snowplowanalytics.iglu.client.{CirceValidator, Client, Resolver}
+import com.snowplowanalytics.iglu.client.{CirceValidator, Client, ClientError, Resolver}
 import com.snowplowanalytics.iglu.client.resolver.registries.Registry.{parse => _, _}
 import com.snowplowanalytics.iglu.core.SelfDescribingData
 import com.snowplowanalytics.iglu.core.circe.implicits._
@@ -22,12 +22,16 @@ object JsonProvider {
   private def parseJson(jsonString: String): Task[Json] =
     Task.fromEither(parse(jsonString))
 
-  private def validateSelfDescribingJsonAndExtractData(json: Json): Task[Json] =
+  private def validateSelfDescribingJsonAndExtractData(json: Json): Task[Json] = {
+    val mapError: ClientError => Throwable =
+      ce => new RuntimeException(Option(ce.getMessage).fold("Manifest validation failed")(identity))
+
     for {
       manifest <- parseSelfDescribingData(json)
       client   = Client[Task, Json](Resolver(List(EmbeddedRegistry), None), CirceValidator)
-      _        <- client.check(manifest).leftMap(e => new RuntimeException(e.getMessage)).value.absolve
+      _        <- client.check(manifest).leftMap(mapError).value.absolve
     } yield manifest.data
+  }
 
   private def getUsedSchemas(jsonData: Json): Task[List[Schema.Metadata]] =
     Task.fromEither(jsonData.hcursor.get[List[Schema.Metadata]]("schemas"))

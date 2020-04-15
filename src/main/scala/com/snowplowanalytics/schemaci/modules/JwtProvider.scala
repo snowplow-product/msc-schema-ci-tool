@@ -1,5 +1,6 @@
 package com.snowplowanalytics.schemaci.modules
 
+import com.snowplowanalytics.schemaci.entities.JwtRequest
 import io.circe._
 import io.circe.generic.extras.Configuration
 import io.circe.generic.extras.semiauto._
@@ -9,15 +10,6 @@ import sttp.client.asynchttpclient.zio.SttpClient
 import zio._
 
 object JwtProvider {
-  case class JwtRequest(
-      clientId: String,
-      clientSecret: String,
-      audience: String,
-      grantType: String,
-      username: String,
-      password: String
-  )
-
   implicit val customConfig: Configuration       = Configuration.default.withSnakeCaseMemberNames
   implicit val snakyEncoder: Encoder[JwtRequest] = deriveConfiguredEncoder
 

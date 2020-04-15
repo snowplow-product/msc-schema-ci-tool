@@ -1,11 +1,11 @@
 package com.snowplowanalytics.schemaci.modules
 
 import cats.implicits._
-import com.snowplowanalytics.schemaci.modules.SchemaApiClient.Schema
 import com.snowplowanalytics.iglu.client.{CirceValidator, Client, Resolver}
 import com.snowplowanalytics.iglu.client.resolver.registries.Registry.{parse => _, _}
 import com.snowplowanalytics.iglu.core.SelfDescribingData
 import com.snowplowanalytics.iglu.core.circe.implicits._
+import com.snowplowanalytics.schemaci.entities.Schema
 import io.circe.Json
 import io.circe.generic.auto._
 import io.circe.parser._

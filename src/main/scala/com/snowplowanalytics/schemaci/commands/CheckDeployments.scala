@@ -1,12 +1,14 @@
 package com.snowplowanalytics.schemaci.commands
 
-import cats.data.NonEmptyList
 import cats.effect.ExitCode
 import cats.implicits._
 import com.snowplowanalytics.schemaci.modules.JsonProvider.extractUsedSchemasFromManifest
 import com.snowplowanalytics.schemaci.modules.JwtProvider.getAccessToken
-import com.snowplowanalytics.schemaci.modules.SchemaApiClient.{checkSchemaDeployment, Schema}
+import com.snowplowanalytics.schemaci.modules.SchemaApiClient.checkSchemaDeployment
 import com.snowplowanalytics.schemaci._
+import com.snowplowanalytics.schemaci.entities.Schema
+import com.snowplowanalytics.schemaci.entities.Schema.Metadata._
+import com.snowplowanalytics.schemaci.errors.DeploymentCheckFailure
 import sttp.client.asynchttpclient.zio.SttpClient
 import zio._
 import zio.console._
@@ -22,27 +24,34 @@ case class CheckDeployments(
     environment: String,
     authServerBaseUrl: URL,
     apiBaseUrl: URL
-)
-object CheckDeployments {
-  def process(
-      authServerBaseUrl: URL,
-      apiBaseUrl: URL
-  )(
-      manifestPath: String,
-      organizationId: UUID,
-      clientId: String,
-      clientSecret: String,
-      audience: URL,
-      username: String,
-      password: String,
-      env: String
-  ): CliTask[ExitCode] =
+) extends CliSubcommand {
+  override def process: CliTask[ExitCode] = {
+    val printInfo: List[Schema.Metadata] => RIO[Console, Unit] = schemas =>
+      for {
+        _ <- putStrLn(s"Ensuring that the following schemas are already deployed on '$environment':")
+        _ <- putStrLn(s"${schemas.show}")
+      } yield ()
+
+    val printSuccess: RIO[Console, Unit] =
+      putStrLn("All schemas are already deployed! You are good to go.")
+
+    val printError: DeploymentCheckFailure => RIO[Console, Unit] = e =>
+      for {
+        _ <- putStrLn(scala.Console.RED)
+        _ <- putStrLn("Deployment check failed!")
+        _ <- putStrLn(s"The following schemas are not deployed on '$environment' yet:")
+        _ <- putStrLn(s"${e.schemas.toList.show}")
+        _ <- putStrLn(scala.Console.RESET)
+      } yield ()
+
     for {
-      schemas <- extractUsedSchemasFromManifest(manifestPath)
-      _       <- putStrLn(schemas.mkString(s"Checking into $env environment if these schemas are deployed: ", ", ", ""))
-      token   <- getAccessToken(authServerBaseUrl.value, clientId, clientSecret, audience.value, username, password)
-      result  <- verifySchemaDeployment(apiBaseUrl.value, token, organizationId.value, env, schemas)
-    } yield result
+      schemas  <- extractUsedSchemasFromManifest(manifestPath)
+      _        <- printInfo(schemas)
+      token    <- getAccessToken(authServerBaseUrl.value, clientId, clientSecret, audience.value, username, password)
+      result   <- verifySchemaDeployment(apiBaseUrl.value, token, organizationId.value, environment, schemas)
+      exitCode <- result.fold(printSuccess.as(ExitCode.Success))(printError(_).as(ExitCode.Error))
+    } yield exitCode
+  }
 
   private def verifySchemaDeployment(
       apiBaseUrl: String,
@@ -50,32 +59,13 @@ object CheckDeployments {
       organizationId: String,
       environment: String,
       schemas: List[Schema.Metadata]
-  ): RIO[SttpClient with Console, ExitCode] =
+  ): RIO[SttpClient with Console, Option[DeploymentCheckFailure]] =
     ZIO
       .collectAllParN(5)(
-        schemas
-          .map(
-            schema =>
-              checkSchemaDeployment(apiBaseUrl, token, organizationId, environment, schema)
-                .map(found => Option(schema).filter(_ => !found))
-          )
-      )
-      .flatMap(
-        results => {
-          Either
-            .fromOption(results.flatten.toNel.map(DeploymentCheckFailure(environment, _)), ())
-            .swap
-            .fold(
-              e => putStrLn(s"Deployment check failed! ${e.getMessage}").as(ExitCode.Error),
-              _ => putStrLn("All schemas are deployed! You are good to go.").as(ExitCode.Success)
-            )
+        schemas.map { schema =>
+          checkSchemaDeployment(apiBaseUrl, token, organizationId, environment, schema)
+            .map(found => Option(schema).filter(_ => !found))
         }
       )
-
-  case class DeploymentCheckFailure(environment: String, schemas: NonEmptyList[Schema.Metadata]) extends Exception {
-    override def getMessage: String =
-      schemas
-        .map(_.toString)
-        .mkString_(s"Some schemas are not deployed on '$environment' environment: ", ", ", "")
-  }
+      .map(_.flatten.toNel.map(DeploymentCheckFailure))
 }

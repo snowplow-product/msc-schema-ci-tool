@@ -4,7 +4,7 @@ import java.security.MessageDigest
 
 import cats.implicits._
 import cats.data.ValidatedNel
-import com.snowplowanalytics.schemaci.modules.SchemaApiClient.Schema._
+import com.snowplowanalytics.schemaci.entities.Schema
 import io.circe._
 import io.circe.generic.auto._
 import sttp.client._
@@ -13,12 +13,6 @@ import sttp.client.asynchttpclient.zio.SttpClient
 import zio.RIO
 
 object SchemaApiClient {
-  object Schema {
-    case class Meta(hidden: Boolean, schemaType: String, customData: Json)
-    case class ValidationRequest(meta: Meta, data: Json)
-    case class Metadata(vendor: String, name: String, format: String, version: String)
-  }
-
   def validateSchema(
       apiBaseUrl: String,
       token: String,
@@ -29,23 +23,22 @@ object SchemaApiClient {
       .send(
         basicRequest.auth
           .bearer(token)
-          .body(ValidationRequest(Meta(false, "entity", Json.fromJsonObject(JsonObject.empty)), schema))
+          .body(Schema.ValidationRequest(Schema.Meta(false, "entity", Json.fromJsonObject(JsonObject.empty)), schema))
           .post(uri"$apiBaseUrl/api/schemas/v1/organizations/$organizationId/validation-requests/sync")
           .response(asJson[Json])
       )
       .map(_.body)
       .absolve
-      .map(
-        body =>
-          for {
-            success <- body.hcursor.get[Boolean]("success")
-            errors  <- body.hcursor.get[List[String]]("errors")
-            errorsNel <- Either.fromOption(
-                          errors.toNel,
-                          ParsingFailure("Errors should not be empty when success is false", null)
-                        )
-          } yield Either.cond(success, (), errorsNel).toValidated
-      )
+      .map { body =>
+        for {
+          success <- body.hcursor.get[Boolean]("success")
+          errors  <- body.hcursor.get[List[String]]("errors")
+          errorsNel <- Either.fromOption(
+                        errors.toNel,
+                        ParsingFailure("Errors should not be empty when success is false", null)
+                      )
+        } yield Either.cond(success, (), errorsNel).toValidated
+      }
       .absolve
 
   def checkSchemaDeployment(

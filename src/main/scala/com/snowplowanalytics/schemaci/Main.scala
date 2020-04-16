@@ -16,7 +16,7 @@ object Main extends App {
       .run(name, description, version = version.some)(allSubcommands, args)
       .provideCustomLayer(AsyncHttpClientZioBackend.layer().orDie)
       .map(_.code)
-      .catchAll(t => putStrLn(t.getMessage).as(1))
+      .catchAll(t => putStrLn(Console.RED + t.getMessage + Console.RESET).as(1))
 
   val allSubcommands: Opts[CliTask[ExitCode]] = Cli.Subcommands.checkDeployments.map(_.process)
 }

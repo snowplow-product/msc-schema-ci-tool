@@ -60,7 +60,7 @@ case class CheckDeployments(
       organizationId: String,
       environment: String,
       schemas: List[Schema.Key]
-  ): ZIO[SttpClient with Console, CliError, Option[NonEmptyList[Schema.Key]]] =
+  ): ZIO[SttpClient, CliError, Option[NonEmptyList[Schema.Key]]] =
     ZIO
       .collectAllParN(5)(
         schemas.map { schema =>

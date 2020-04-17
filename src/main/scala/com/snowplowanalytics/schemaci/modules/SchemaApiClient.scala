@@ -14,7 +14,6 @@ import sttp.client.asynchttpclient.zio.SttpClient
 import sttp.client.circe._
 import sttp.model.Uri
 import zio.{IO, RIO, ZIO}
-import zio.console._
 
 object SchemaApiClient {
   def validateSchema(
@@ -60,7 +59,7 @@ object SchemaApiClient {
       organizationId: String,
       environment: String,
       schemaMetadata: Schema.Key
-  ): ZIO[SttpClient with Console, CliError, Boolean] = {
+  ): ZIO[SttpClient, CliError, Boolean] = {
     val basePath = s"$apiBaseUrl/api/schemas/v1"
     val filters  = s"env=$environment&version=${schemaMetadata.version}"
 

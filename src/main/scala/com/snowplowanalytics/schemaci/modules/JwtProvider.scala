@@ -36,6 +36,8 @@ object JwtProvider {
 
     HttpClient
       .sendRequest(request, accessTokenExtractor)
-      .mapError(_ => InvalidCredentials)
+      .catchSome {
+        case _: ParsingError => IO.fail(InvalidCredentials)
+      }
   }
 }

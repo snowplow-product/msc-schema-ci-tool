@@ -2,15 +2,16 @@ package com.snowplowanalytics
 
 import cats.implicits._
 import com.monovore.decline.Opts
+import com.snowplowanalytics.schemaci.errors.CliError
 import eu.timepit.refined._
 import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.string.{Url, Uuid}
 import sttp.client.asynchttpclient.zio.SttpClient
-import zio.RIO
+import zio.ZIO
 import zio.console.Console
 
 package object schemaci {
-  type CliTask[A] = RIO[Console with SttpClient, A]
+  type CliTask[A] = ZIO[Console with SttpClient, CliError, A]
 
   type UUID = Refined[String, Uuid]
   type URL  = Refined[String, Url]
@@ -19,7 +20,8 @@ package object schemaci {
     def refine[P](message: A => String)(implicit V: Validate[A, P]): Opts[Refined[A, P]] =
       opts.mapValidated { v =>
         val erroredOpts = opts.toString().stripPrefix("Opts(").stripSuffix(")")
-        refineV[P](v).leftMap(_ => s"Error while parsing [$erroredOpts]: ${message(v)}").toValidatedNel
+        val maybePath   = Option(erroredOpts).filter(!_.isEmpty).map(" [" + _ + "]: ").getOrElse(": ")
+        refineV[P](v).leftMap(_ => "Error while parsing" + maybePath + message(v)).toValidatedNel
       }
 
     def refineToUrl(implicit V: Validate[A, Url]): Opts[Refined[A, Url]] =

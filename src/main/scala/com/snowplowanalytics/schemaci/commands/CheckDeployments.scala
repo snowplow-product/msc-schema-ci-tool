@@ -1,14 +1,15 @@
 package com.snowplowanalytics.schemaci.commands
 
+import cats.data.NonEmptyList
 import cats.effect.ExitCode
 import cats.implicits._
-import com.snowplowanalytics.schemaci.modules.JsonProvider.extractUsedSchemasFromManifest
-import com.snowplowanalytics.schemaci.modules.JwtProvider.getAccessToken
-import com.snowplowanalytics.schemaci.modules.SchemaApiClient.checkSchemaDeployment
 import com.snowplowanalytics.schemaci._
 import com.snowplowanalytics.schemaci.entities.Schema
-import com.snowplowanalytics.schemaci.entities.Schema.Metadata._
-import com.snowplowanalytics.schemaci.errors.DeploymentCheckFailure
+import com.snowplowanalytics.schemaci.entities.Schema.Key._
+import com.snowplowanalytics.schemaci.errors.CliError
+import com.snowplowanalytics.schemaci.modules.JsonProvider.extractSchemaDependenciesFromManifest
+import com.snowplowanalytics.schemaci.modules.JwtProvider.getAccessToken
+import com.snowplowanalytics.schemaci.modules.SchemaApiClient.checkSchemaDeployment
 import sttp.client.asynchttpclient.zio.SttpClient
 import zio._
 import zio.console._
@@ -26,26 +27,26 @@ case class CheckDeployments(
     apiBaseUrl: URL
 ) extends CliSubcommand {
   override def process: CliTask[ExitCode] = {
-    val printInfo: List[Schema.Metadata] => RIO[Console, Unit] = schemas =>
+    val printInfo: List[Schema.Key] => URIO[Console, Unit] = schemas =>
       for {
         _ <- putStrLn(s"Ensuring that the following schemas are already deployed on '$environment':")
         _ <- putStrLn(s"${schemas.show}")
       } yield ()
 
-    val printSuccess: RIO[Console, Unit] =
+    val printSuccess: URIO[Console, Unit] =
       putStrLn("All schemas are already deployed! You are good to go.")
 
-    val printError: DeploymentCheckFailure => RIO[Console, Unit] = e =>
+    val printError: NonEmptyList[Schema.Key] => URIO[Console, Unit] = e =>
       for {
         _ <- putStrLn(scala.Console.RED)
         _ <- putStrLn("Deployment check failed!")
         _ <- putStrLn(s"The following schemas are not deployed on '$environment' yet:")
-        _ <- putStrLn(s"${e.schemas.toList.show}")
+        _ <- putStrLn(s"${e.toList.show}")
         _ <- putStrLn(scala.Console.RESET)
       } yield ()
 
     for {
-      schemas  <- extractUsedSchemasFromManifest(manifestPath)
+      schemas  <- extractSchemaDependenciesFromManifest(manifestPath)
       _        <- printInfo(schemas)
       token    <- getAccessToken(authServerBaseUrl.value, clientId, clientSecret, audience.value, username, password)
       result   <- verifySchemaDeployment(apiBaseUrl.value, token, organizationId.value, environment, schemas)
@@ -58,8 +59,8 @@ case class CheckDeployments(
       token: String,
       organizationId: String,
       environment: String,
-      schemas: List[Schema.Metadata]
-  ): RIO[SttpClient with Console, Option[DeploymentCheckFailure]] =
+      schemas: List[Schema.Key]
+  ): ZIO[SttpClient with Console, CliError, Option[NonEmptyList[Schema.Key]]] =
     ZIO
       .collectAllParN(5)(
         schemas.map { schema =>
@@ -67,5 +68,5 @@ case class CheckDeployments(
             .map(found => Option(schema).filter(_ => !found))
         }
       )
-      .map(_.flatten.toNel.map(DeploymentCheckFailure))
+      .map(_.flatten.toNel)
 }

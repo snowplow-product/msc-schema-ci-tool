@@ -9,12 +9,12 @@ object Cli {
   object Envs {
     // Common environment variables
     val authServerBaseUrl: Opts[URL] = Opts
-      .env[String]("AUTH_SERVER_BASE_URL", help = "Authentication server base url")
+      .env[String]("AUTH_SERVER_BASE_URL", "Authentication server base url", "URL")
       .refineToUrl
       .withDefault("https://id.snowplowanalytics.com")
 
     val apiBaseUrl: Opts[URL] = Opts
-      .env[String]("API_BASE_URL", help = "Snowplow API base url")
+      .env[String]("API_BASE_URL", "Snowplow API base url", "URL")
       .refineToUrl
       .withDefault("https://console.snowplowanalytics.com")
   }

@@ -9,16 +9,16 @@ object Schema {
 
   case class ValidationRequest(meta: Meta, data: Json)
 
-  case class Metadata(vendor: String, name: String, format: String, version: String)
-  object Metadata {
-    implicit val metadataShow: Show[Metadata] =
+  case class Key(vendor: String, name: String, format: String, version: String)
+  object Key {
+    implicit val metadataShow: Show[Key] =
       Show.show(metadata => {
         s"""|- Vendor:  ${metadata.vendor}
             |  Name:    ${metadata.name}
             |  Format:  ${metadata.format}
             |  Version: ${metadata.version}""".stripMargin
       })
-    implicit val metadataListShow: Show[List[Metadata]] =
+    implicit val metadataListShow: Show[List[Key]] =
       Show.show(metaList => metaList.mkString_("\n", "\n\n", "\n"))
   }
 }

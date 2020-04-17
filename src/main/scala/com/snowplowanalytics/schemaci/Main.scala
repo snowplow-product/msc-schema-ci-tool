@@ -13,10 +13,10 @@ import zio.interop.catz._
 object Main extends App {
   override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] =
     CommandIOApp
-      .run(name, description, version = version.some)(allSubcommands, args)
+      .run(name, description, version = version.some)(allSubcommands.map(_.leftWiden[Throwable]), args)
       .provideCustomLayer(AsyncHttpClientZioBackend.layer().orDie)
       .map(_.code)
       .catchAll(t => putStrLn(Console.RED + t.getMessage + Console.RESET).as(1))
 
-  val allSubcommands: Opts[CliTask[ExitCode]] = Cli.Subcommands.checkDeployments.map(_.process)
+  val allSubcommands: Opts[CliTask[ExitCode]] = Cli.Subcommands.checkDeployments.map(_.process.leftWiden)
 }

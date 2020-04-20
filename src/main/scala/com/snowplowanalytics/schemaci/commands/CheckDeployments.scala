@@ -17,14 +17,14 @@ import zio.console._
 case class CheckDeployments(
     manifestPath: String,
     organizationId: UUID,
-    clientId: String,
-    clientSecret: String,
-    audience: URL,
     username: String,
     password: String,
     environment: String,
+    apiBaseUrl: URL,
     authServerBaseUrl: URL,
-    apiBaseUrl: URL
+    clientId: String,
+    clientSecret: String,
+    audience: URL
 ) extends CliSubcommand {
   override def process: CliTask[ExitCode] = {
     val printInfo: List[Schema.Key] => URIO[Console, Unit] = schemas =>

@@ -20,12 +20,14 @@ You can download schema-ci from our Bintray repository, using the following comm
 curl -L "http://dl.bintray.com/snowplow/snowplow-generic/schema-ci-0.1.0.zip" | jar xv
 ```
 
-In order to be able to perform any task, you need to obtain some credentials and some details for the tool 
-to be able to interact with Schema API. These credentials come in form of an organization id (uuid) and OAuth2 
-client id, client secret, audience, username and password.  
-Refer to [Data Workflow team on Slack](https://appurl.io/Wb0tgBlFO) on how to obtain them.
+In order to be able to perform any task, you need to supply an organization id (UUID), 
+a username and a password.
+You should be able to obtain them from Insights UI:
+- The organization ID can be extracted from the Insights page URL
+- The username and password can be obtained by creating an admin user for your organization that you will use for CI
+  purposes
 
-## CLI
+## Usage
 
 ### Check Deployments
 
@@ -37,9 +39,6 @@ Syntax:
 $ ./schema-ci check \
     --manifestPath /path/to/manifest/snowplow-schemas.json \
     --organizationId <organization-id> \
-    --clientId <client-id> \
-    --clientSecret <client-secret> \
-    --audience <audience> \
     --username <username> \
     --password <password> \
     --environment DEV
@@ -114,8 +113,11 @@ If you are developing new commands or if you just want to test this tool against
 variables before starting the tool:
 
 ```bash
-export AUTH_SERVER_BASE_URL=https://snowplow-next.eu.auth0.com
 export API_BASE_URL=https://next.console.snowplowanalytics.com
+export AUTH_SERVER_BASE_URL=https://snowplow-next.eu.auth0.com
+export AUTH_CLIENT_ID=YCE5aZubvHRZ7hqF0B1XxwRR3cAApu9G
+export AUTH_CLIENT_SECRET=nPbA7bAp8p_0gmClRJCHmUqO5Lv1ky6xSnElAV4oIpesaXzUf9mTcoo5uFZoUHUG
+export AUTH_AUDIENCE=https://snowplowanalytics.com/api/
 ```
 
 [travis-image]: https://travis-ci.com/snowplow-product/msc-schema-ci-tool.svg?token=F4Ce9m1YA8HqgpFQMcL5&branch=master

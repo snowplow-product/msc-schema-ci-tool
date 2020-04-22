@@ -2,78 +2,101 @@ package com.snowplowanalytics.schemaci.modules
 
 import java.security.MessageDigest
 
+import cats.data.NonEmptyList
 import cats.implicits._
-import cats.data.ValidatedNel
-import com.snowplowanalytics.schemaci.modules.SchemaApiClient.Schema._
+import com.snowplowanalytics.schemaci.entities.Schema
+import com.snowplowanalytics.schemaci.entities.Schema.ValidationResponse
+import com.snowplowanalytics.schemaci.errors.CliError
+import com.snowplowanalytics.schemaci.errors.CliError.Json.ParsingError
 import io.circe._
 import io.circe.generic.auto._
-import sttp.client._
-import sttp.client.circe._
+import sttp.client.{Request, _}
 import sttp.client.asynchttpclient.zio.SttpClient
-import zio.RIO
+import sttp.client.circe._
+import sttp.model.Uri
+import zio.{IO, RIO, ZIO}
 
 object SchemaApiClient {
-  object Schema {
-    case class Meta(hidden: Boolean, schemaType: String, customData: Json)
-    case class ValidationRequest(meta: Meta, data: Json)
-    case class Metadata(vendor: String, name: String, format: String, version: String)
-  }
-
   def validateSchema(
       apiBaseUrl: String,
       token: String,
       organizationId: String,
       schema: Json
-  ): RIO[SttpClient, ValidatedNel[String, Unit]] =
-    SttpClient
-      .send(
-        basicRequest.auth
-          .bearer(token)
-          .body(ValidationRequest(Meta(false, "entity", Json.fromJsonObject(JsonObject.empty)), schema))
-          .post(uri"$apiBaseUrl/api/schemas/v1/organizations/$organizationId/validation-requests/sync")
-          .response(asJson[Json])
-      )
-      .map(_.body)
-      .absolve
-      .map(
-        body =>
-          for {
-            success <- body.hcursor.get[Boolean]("success")
-            errors  <- body.hcursor.get[List[String]]("errors")
-            errorsNel <- Either.fromOption(
-                          errors.toNel,
-                          ParsingFailure("Errors should not be empty when success is false", null)
-                        )
-          } yield Either.cond(success, (), errorsNel).toValidated
-      )
-      .absolve
+  ): RIO[SttpClient, ValidationResponse] = {
+    val buildRequest: Uri => Request[Either[String, String], Nothing] =
+      basicRequest.auth
+        .bearer(token)
+        .body(
+          Schema.ValidationRequest(
+            Schema.Meta(hidden = false, "entity", Json.fromJsonObject(JsonObject.empty)),
+            schema
+          )
+        )
+        .post(_)
+
+    val extractEventualErrorsAndWarnings: Json => Either[ParsingError, ValidationResponse] = { body =>
+      val extractNonEmptyErrors: Either[ParsingError, NonEmptyList[String]] =
+        body.hcursor
+          .get[List[String]]("errors")
+          .leftMap(ParsingError("Cannot extract 'errors' from response", _))
+          .flatMap { errors =>
+            Either.fromOption(errors.toNel, ParsingError("Operation was not successful, but errors array is empty"))
+          }
+
+      val maybeErrors: Either[ParsingError, Option[NonEmptyList[String]]] =
+        body.hcursor
+          .get[Boolean]("success")
+          .leftMap(ParsingError("Cannot extract 'success' from response", _))
+          .ifM(none.asRight, extractNonEmptyErrors.map(_.some))
+
+      val warnings: Either[ParsingError, List[String]] =
+        body.hcursor
+          .get[List[String]]("warnings")
+          .leftMap(ParsingError("Cannot extract 'warnings' from response", _))
+
+      (maybeErrors, warnings).mapN(ValidationResponse)
+    }
+
+    for {
+      uri         <- parseUri(s"$apiBaseUrl/api/schemas/v1/organizations/$organizationId/validation-requests/sync")
+      maybeErrors <- HttpClient.sendRequest(buildRequest(uri), extractEventualErrorsAndWarnings)
+    } yield maybeErrors
+  }
 
   def checkSchemaDeployment(
       apiBaseUrl: String,
       token: String,
       organizationId: String,
       environment: String,
-      schemaMetadata: Schema.Metadata
-  ): RIO[SttpClient, Boolean] =
-    SttpClient
-      .send(
-        basicRequest.auth
-          .bearer(token)
-          .post(
-            uri"$apiBaseUrl/api/schemas/v1/organizations/$organizationId/schemas/${computeSchemaHash(organizationId, schemaMetadata)}/deployments?env=$environment&version=${schemaMetadata.version}"
-          )
-          .response(asJson[Json])
-      )
-      .map(_.body)
-      .absolve
-      .map(_.hcursor.as[List[Json]])
-      .absolve
-      .map(_.nonEmpty)
+      schemaMetadata: Schema.Key
+  ): ZIO[SttpClient, CliError, Boolean] = {
+    val basePath = s"$apiBaseUrl/api/schemas/v1"
+    val filters  = s"env=$environment&version=${schemaMetadata.version}"
 
-  private def computeSchemaHash(organizationId: String, meta: Schema.Metadata): String =
-    MessageDigest
-      .getInstance("SHA-256")
-      .digest(s"$organizationId-${meta.vendor}-${meta.name}-${meta.format}".getBytes("UTF-8"))
-      .map("%02x".format(_))
-      .mkString
+    val extractDeployments: Json => Either[ParsingError, List[Json]] =
+      _.hcursor.as[List[Json]].leftMap(ParsingError("Unexpected response format", _))
+
+    for {
+      schemaHash  <- computeSchemaHash(organizationId, schemaMetadata)
+      uri         <- parseUri(s"$basePath/organizations/$organizationId/schemas/$schemaHash/deployments?$filters")
+      deployments <- HttpClient.sendRequest(basicRequest.auth.bearer(token).post(uri), extractDeployments)
+    } yield deployments.nonEmpty
+  }
+
+  private def parseUri(uri: String): IO[CliError, Uri] =
+    ZIO
+      .effect(Uri.parse(uri).leftMap(error => CliError.GenericError(s"Uri parsing error: $uri ($error)")))
+      .mapError(CliError.GenericError(s"Uri parsing error: $uri", _))
+      .absolve
+
+  private def computeSchemaHash(organizationId: String, meta: Schema.Key): IO[CliError, String] =
+    ZIO
+      .effect(
+        MessageDigest
+          .getInstance("SHA-256")
+          .digest(s"$organizationId-${meta.vendor}-${meta.name}-${meta.format}".getBytes("UTF-8"))
+          .map("%02x".format(_))
+          .mkString
+      )
+      .mapError(CliError.GenericError("Hashing error", _))
 }

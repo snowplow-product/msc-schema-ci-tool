@@ -1,6 +1,7 @@
 package com.snowplowanalytics.schemaci.entities
 
 import cats.Show
+import cats.data.NonEmptyList
 import cats.implicits._
 import io.circe.Json
 
@@ -8,6 +9,7 @@ object Schema {
   case class Meta(hidden: Boolean, schemaType: String, customData: Json)
 
   case class ValidationRequest(meta: Meta, data: Json)
+  case class ValidationResponse(errors: Option[NonEmptyList[String]], warnings: List[String])
 
   case class Key(vendor: String, name: String, format: String, version: String)
   object Key {

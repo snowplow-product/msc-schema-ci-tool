@@ -20,7 +20,7 @@ package object schemaci {
     def refine[P](message: A => String)(implicit V: Validate[A, P]): Opts[Refined[A, P]] =
       opts.mapValidated { v =>
         val erroredOpts = opts.toString().stripPrefix("Opts(").stripSuffix(")")
-        val maybePath   = Option(erroredOpts).filter(!_.isEmpty).map(" [" + _ + "]: ").getOrElse(": ")
+        val maybePath   = Option(erroredOpts).filter(_.nonEmpty).map(" [" + _ + "]: ").getOrElse(": ")
         refineV[P](v).leftMap(_ => "Error while parsing" + maybePath + message(v)).toValidatedNel
       }
 

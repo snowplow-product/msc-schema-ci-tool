@@ -5,6 +5,7 @@ import java.security.MessageDigest
 import cats.data.NonEmptyList
 import cats.implicits._
 import com.snowplowanalytics.schemaci.entities.Schema
+import com.snowplowanalytics.schemaci.entities.Schema.ValidationResponse
 import com.snowplowanalytics.schemaci.errors.CliError
 import com.snowplowanalytics.schemaci.errors.CliError.Json.ParsingError
 import io.circe._
@@ -21,7 +22,7 @@ object SchemaApiClient {
       token: String,
       organizationId: String,
       schema: Json
-  ): RIO[SttpClient, Option[NonEmptyList[String]]] = {
+  ): RIO[SttpClient, ValidationResponse] = {
     val buildRequest: Uri => Request[Either[String, String], Nothing] =
       basicRequest.auth
         .bearer(token)
@@ -33,23 +34,32 @@ object SchemaApiClient {
         )
         .post(_)
 
-    val extractEventualErrors: Json => Either[ParsingError, Option[NonEmptyList[String]]] = { body =>
-      val extractNonEmptyErrorsOnFailure: Either[ParsingError, NonEmptyList[String]] = body.hcursor
-        .get[List[String]]("errors")
-        .leftMap(ParsingError("Cannot extract 'errors' from response", _))
-        .flatMap { errors =>
-          Either.fromOption(errors.toNel, ParsingError("Operation was not successful, but errors array is empty"))
-        }
+    val extractEventualErrorsAndWarnings: Json => Either[ParsingError, ValidationResponse] = { body =>
+      val extractNonEmptyErrors: Either[ParsingError, NonEmptyList[String]] =
+        body.hcursor
+          .get[List[String]]("errors")
+          .leftMap(ParsingError("Cannot extract 'errors' from response", _))
+          .flatMap { errors =>
+            Either.fromOption(errors.toNel, ParsingError("Operation was not successful, but errors array is empty"))
+          }
 
-      body.hcursor
+      val maybeErrors: Either[ParsingError, Option[NonEmptyList[String]]] = 
+        body.hcursor
         .get[Boolean]("success")
         .leftMap(ParsingError("Cannot extract 'success' from response", _))
-        .ifM(none.asRight, extractNonEmptyErrorsOnFailure.map(_.some))
+        .ifM(none.asRight, extractNonEmptyErrors.map(_.some))
+      
+      val warnings: Either[ParsingError, List[String]] =
+        body.hcursor
+          .get[List[String]]("warnings")
+          .leftMap(ParsingError("Cannot extract 'warnings' from response", _))
+
+      (maybeErrors, warnings).mapN(ValidationResponse)
     }
 
     for {
       uri         <- parseUri(s"$apiBaseUrl/api/schemas/v1/organizations/$organizationId/validation-requests/sync")
-      maybeErrors <- HttpClient.sendRequest(buildRequest(uri), extractEventualErrors)
+      maybeErrors <- HttpClient.sendRequest(buildRequest(uri), extractEventualErrorsAndWarnings)
     } yield maybeErrors
   }
 

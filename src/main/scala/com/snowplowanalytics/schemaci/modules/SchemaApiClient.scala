@@ -43,12 +43,12 @@ object SchemaApiClient {
             Either.fromOption(errors.toNel, ParsingError("Operation was not successful, but errors array is empty"))
           }
 
-      val maybeErrors: Either[ParsingError, Option[NonEmptyList[String]]] = 
+      val maybeErrors: Either[ParsingError, Option[NonEmptyList[String]]] =
         body.hcursor
-        .get[Boolean]("success")
-        .leftMap(ParsingError("Cannot extract 'success' from response", _))
-        .ifM(none.asRight, extractNonEmptyErrors.map(_.some))
-      
+          .get[Boolean]("success")
+          .leftMap(ParsingError("Cannot extract 'success' from response", _))
+          .ifM(none.asRight, extractNonEmptyErrors.map(_.some))
+
       val warnings: Either[ParsingError, List[String]] =
         body.hcursor
           .get[List[String]]("warnings")

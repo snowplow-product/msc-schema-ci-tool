@@ -30,8 +30,6 @@ object Cli {
 
   object Options {
     // Common options
-    val organizationId: Opts[UUID] =
-      Opts.option[String]("organizationId", "The Organization Id (UUID)", "", "UUID").refineToUuid
     val username: Opts[String] =
       Opts.option[String]("username", "Username of the CI user", "", "string")
     val password: Opts[String] =
@@ -52,7 +50,6 @@ object Cli {
       ) {
         (
           Options.manifestPath,
-          Options.organizationId,
           Options.username,
           Options.password,
           Options.environment,

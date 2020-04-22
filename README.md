@@ -20,12 +20,9 @@ You can download schema-ci from our Bintray repository, using the following comm
 curl -L "http://dl.bintray.com/snowplow/snowplow-generic/schema-ci-0.1.0.zip" | jar xv
 ```
 
-In order to be able to perform any task, you need to supply an organization id (UUID), 
-a username and a password.
-You should be able to obtain them from Insights UI:
-- The organization ID can be extracted from the Insights page URL
-- The username and password can be obtained by creating an admin user for your organization that you will use for CI
-  purposes
+In order to be able to perform any task, you need to supply credentials of a user which you will use for CI purposes.
+These credentials come in form of a username and a password which can be obtained by creating an __admin__
+user for your organization from the dedicated Insights UI page.
 
 ## Usage
 
@@ -38,7 +35,6 @@ Syntax:
 ```bash
 $ ./schema-ci check \
     --manifestPath /path/to/manifest/snowplow-schemas.json \
-    --organizationId <organization-id> \
     --username <username> \
     --password <password> \
     --environment DEV
@@ -109,8 +105,8 @@ An example of how a manifest looks like:
 
 ## Development
 
-If you are developing new commands or if you just want to test this tool against Next, just make sure to set these environment
-variables before starting the tool:
+If you are developing new commands or if you just want to test this tool against Next, just make sure to set these 
+environment variables before starting the tool:
 
 ```bash
 export API_BASE_URL=https://next.console.snowplowanalytics.com

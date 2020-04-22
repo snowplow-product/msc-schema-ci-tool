@@ -21,7 +21,9 @@ object HttpClient {
   def sendRequest(request: Request[Either[String, String], Nothing]): ZIO[SttpClient, CliError, Json] =
     SttpClient
       .send(request.response(asJsonAlways[Json]))
-      .mapError(CliError.GenericError("Network error", _))
-      .map(_.body.leftMap(de => CliError.Json.ParsingError("Cannot decode response payload as JSON", de.error)))
+      .bimap(
+        CliError.GenericError("Network error", _),
+        _.body.leftMap(de => CliError.Json.ParsingError("Cannot decode response payload as JSON", de.error))
+      )
       .absolve
 }

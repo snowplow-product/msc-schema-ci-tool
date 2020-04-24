@@ -3,7 +3,6 @@ package com.snowplowanalytics.schemaci.modules
 import java.security.PublicKey
 
 import cats.implicits._
-import cats.Semigroupal
 import com.chatwork.scala.jwk.{JWK, JWKSet, KeyId, RSAJWK}
 import com.chatwork.scala.jwk.JWSAlgorithmType.AlgorithmFamily._
 import com.snowplowanalytics.schemaci.entities.JwtRequest
@@ -60,10 +59,11 @@ object JwtProvider {
         case rsa: RSAJWK => rsa.toPublicKey.toOption
       }
       for {
-        (kid, alg) <- Semigroupal[Option].product(header.keyId, header.algorithm)
-        jwk        <- keys.keyByKeyId(KeyId(kid))
-        _          <- jwk.algorithmType.filter(algType => RSA.values.contains(algType) && algType.entryName == alg.name)
-        rsaPubKey  <- rsaToPublicKey.lift.andThen(_.flatten)(jwk)
+        kid       <- header.keyId
+        alg       <- header.algorithm
+        jwk       <- keys.keyByKeyId(KeyId(kid))
+        _         <- jwk.algorithmType.filter(algType => RSA.values.contains(algType) && algType.entryName == alg.name)
+        rsaPubKey <- rsaToPublicKey.lift.andThen(_.flatten)(jwk)
       } yield rsaPubKey
     }
 

@@ -7,24 +7,25 @@ import com.snowplowanalytics.schemaci._
 import com.snowplowanalytics.schemaci.entities.Schema
 import com.snowplowanalytics.schemaci.entities.Schema.Key._
 import com.snowplowanalytics.schemaci.errors.CliError
-import com.snowplowanalytics.schemaci.modules.JsonProvider._
-import com.snowplowanalytics.schemaci.modules.JwtProvider._
-import com.snowplowanalytics.schemaci.modules.SchemaApiClient.checkSchemaDeployment
-import sttp.client.asynchttpclient.zio.SttpClient
+import com.snowplowanalytics.schemaci.modules.Json._
+import com.snowplowanalytics.schemaci.modules.Jwt._
+import com.snowplowanalytics.schemaci.modules.SchemaApi
+import com.snowplowanalytics.schemaci.modules.SchemaApi.checkSchemaDeployment
 import zio._
 import zio.console._
 
 case class CheckDeployments(
-    manifestPath: String,
-    username: String,
-    password: String,
-    environment: String,
-    apiBaseUrl: URL,
-    authServerBaseUrl: URL,
-    clientId: String,
-    clientSecret: String,
-    audience: URL
+  manifestPath: String,
+  username: String,
+  password: String,
+  environment: String,
+  apiBaseUrl: URL,
+  authServerBaseUrl: URL,
+  clientId: String,
+  clientSecret: String,
+  audience: URL
 ) extends CliSubcommand {
+
   override def process: CliTask[ExitCode] = {
     val printInfo: List[Schema.Key] => URIO[Console, Unit] = schemas =>
       for {
@@ -55,16 +56,17 @@ case class CheckDeployments(
   }
 
   private def verifySchemaDeployment(
-      apiBaseUrl: URL,
-      token: String,
-      organizationId: UUID,
-      environment: String,
-      schemas: List[Schema.Key]
-  ): ZIO[SttpClient, CliError, Option[NonEmptyList[Schema.Key]]] =
+    apiBaseUrl: URL,
+    token: String,
+    organizationId: UUID,
+    environment: String,
+    schemas: List[Schema.Key]
+  ): ZIO[SchemaApi, CliError, Option[NonEmptyList[Schema.Key]]] =
     ZIO
       .foreachParN(5)(schemas) { schema =>
         checkSchemaDeployment(apiBaseUrl, token, organizationId, environment, schema)
           .map(found => Option(schema).filter(_ => !found))
       }
       .map(_.flatten.toNel)
+
 }

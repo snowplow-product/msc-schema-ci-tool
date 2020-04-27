@@ -14,6 +14,8 @@ import com.snowplowanalytics.schemaci.modules.SchemaApi.checkSchemaDeployment
 import zio._
 import zio.console._
 
+import scala.io.Source
+
 case class CheckDeployments(
   manifestPath: String,
   username: String,
@@ -46,7 +48,7 @@ case class CheckDeployments(
       } yield ()
 
     for {
-      schemas  <- extractSchemaDependenciesFromManifest(manifestPath)
+      schemas  <- extractSchemaDependenciesFromManifest(Source.fromFile(manifestPath))
       _        <- printInfo(schemas)
       token    <- getAccessToken(authServerBaseUrl, clientId, clientSecret, audience, username, password)
       orgId    <- extractOrganizationIdFromToken(authServerBaseUrl, token)

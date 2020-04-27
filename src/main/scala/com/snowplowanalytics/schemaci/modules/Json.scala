@@ -15,22 +15,22 @@ import zio._
 import zio.interop.catz._
 import zio.interop.catz.implicits._
 
-import scala.io.{BufferedSource, Source}
+import scala.io.Source
 
 object Json {
 
   trait Service {
-    def extractSchemaDependenciesFromManifest(path: String): IO[CliError, List[Schema.Key]]
+    def extractSchemaDependenciesFromManifest(source: => Source): IO[CliError, List[Schema.Key]]
   }
 
   // accessors
-  def extractSchemaDependenciesFromManifest(path: String): ZIO[Json, CliError, List[Schema.Key]] =
-    ZIO.accessM(_.get[Json.Service].extractSchemaDependenciesFromManifest(path))
+  def extractSchemaDependenciesFromManifest(source: => Source): ZIO[Json, CliError, List[Schema.Key]] =
+    ZIO.accessM(_.get[Json.Service].extractSchemaDependenciesFromManifest(source))
 
   // implementations
   final class CirceImpl extends Service {
 
-    override def extractSchemaDependenciesFromManifest(path: String): IO[CliError, List[Schema.Key]] = {
+    override def extractSchemaDependenciesFromManifest(source: => Source): IO[CliError, List[Schema.Key]] = {
       val mapValidationError: ClientError => CliError =
         c => ParsingError("Manifest validation failed", new Exception(c.getMessage).some)
       val mapResolutionError: Throwable => CliError =
@@ -42,7 +42,7 @@ object Json {
           .mapError(CliError.Json.ParsingError("Cannot extract 'schemas' from manifest", _))
 
       for {
-        jsonString <- readFileToString(path)
+        jsonString <- readFileToString(source)
         json       <- parseJson(jsonString)
         manifest   <- parseSelfDescribingJsonData(json)
         client      = Client[Task, CJson](Resolver(List(EmbeddedRegistry), None), CirceValidator)
@@ -61,15 +61,10 @@ object Json {
         .fromEither(parse(jsonString))
         .mapError(CliError.Json.ParsingError("JSON parsing failure", _))
 
-    private def readFileToString(path: String): IO[CliError, String] = {
-      val openFile: String => Task[BufferedSource] = path => Task.effect(Source.fromFile(path, "UTF-8"))
-      val readFile: BufferedSource => Task[String] = file => Task.effect(file.getLines.mkString)
-      val closeFile: BufferedSource => UIO[Unit]   = bs => Task.effect(bs.close()).ignore
-
+    private def readFileToString(source: => Source): IO[CliError, String] =
       ZIO
-        .bracket(openFile(path))(closeFile)(readFile)
-        .mapError(CliError.GenericError(s"Cannot open/read $path", _))
-    }
+        .bracket(Task.effect(source))(s => Task.effect(s.close()).ignore)(s => Task.effect(s.getLines.mkString))
+        .mapError(CliError.GenericError(s"Cannot open/read ${source.descr}", _))
 
   }
 

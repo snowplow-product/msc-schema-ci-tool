@@ -1,0 +1,13 @@
+{
+  "schema": "iglu:com.snowplowanalytics/schema_dependencies/jsonschema/1-0-0",
+  "data": {
+    "schemas": [
+      {
+        "vendor": "com.snplow.msc.gcp",
+        "name": "example_event",
+        "format": "jsonschema",
+        "version": "1-0-0"
+      }
+    ]
+  }
+}

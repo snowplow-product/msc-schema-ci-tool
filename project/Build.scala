@@ -76,7 +76,7 @@ object Build {
       version,
       description,
       "cid" -> "default", // This should be set when Auth0 client gets created on Prod
-      "cs" -> "default" // This should be set when Auth0 client gets created on Prod
+      "cs"  -> "default"  // This should be set when Auth0 client gets created on Prod
     ),
     buildInfoPackage := "com.snowplowanalytics.schemaci"
   )

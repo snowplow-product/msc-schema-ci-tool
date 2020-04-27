@@ -71,7 +71,13 @@ object Build {
   )
 
   lazy val sbtBuildInfoSettings: Seq[Setting[_]] = Seq(
-    buildInfoKeys := Seq[BuildInfoKey](name, version, description),
+    buildInfoKeys := Seq[BuildInfoKey](
+      name,
+      version,
+      description,
+      "cid" -> "default", // This should be set when Auth0 client gets created on Prod
+      "cs" -> "default" // This should be set when Auth0 client gets created on Prod
+    ),
     buildInfoPackage := "com.snowplowanalytics.schemaci"
   )
 

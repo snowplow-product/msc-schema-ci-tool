@@ -1,6 +1,7 @@
 package com.snowplowanalytics.schemaci
 
 import cats.implicits._
+import com.github.j5ik2o.base64scala.Base64String
 import com.monovore.decline.Opts
 import com.snowplowanalytics.schemaci.commands.CheckDeployments
 import eu.timepit.refined.auto._
@@ -22,14 +23,16 @@ object Cli {
 
     val authClientId: Opts[String] = Opts
       .env[String]("AUTH_CLIENT_ID", "Client Id of the registered OAuth2 app", "string")
-      .withDefault("example") // This should be set when Auth0 client gets created on Prod
+      .withDefault(decode(BuildInfo.cid))
+
     val authClientSecret: Opts[String] = Opts
       .env[String]("AUTH_CLIENT_SECRET", "Client Secret of the registered OAuth2 app", "string")
-      .withDefault("example") // This should be set when Auth0 client gets created on Prod
+      .withDefault(decode(BuildInfo.cs))
+
     val authAudience: Opts[URL] = Opts
       .env[String]("AUTH_AUDIENCE", "Audience of the registered OAuth2 app", "URL")
       .refineToUrl
-      .withDefault("https://example.com") // This should be set when Auth0 client gets created on Prod
+      .withDefault("https://snowplowanalytics.com/api/") // This should be set when Auth0 client gets created on Prod
   }
 
   object Options {
@@ -69,4 +72,5 @@ object Cli {
 
   }
 
+  private val decode: String => String = Base64String(_, urlSafe = true).decodeToString.right.get
 }

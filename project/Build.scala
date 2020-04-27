@@ -14,6 +14,8 @@ object Build {
     val circe      = "0.13.0"
     val decline    = "1.2.0"
     val igluClient = "1.0.0-rc1"
+    val jwt        = "4.3.0"
+    val jwk        = "1.0.5"
   }
 
   val dependencies: Seq[ModuleID] = Seq(
@@ -32,6 +34,8 @@ object Build {
     "com.monovore"                 %% "decline-effect"                % Versions.decline,
     "com.monovore"                 %% "decline-refined"               % Versions.decline,
     "com.snowplowanalytics"        %% "iglu-scala-client"             % Versions.igluClient,
+    "com.pauldijou"                %% "jwt-circe"                     % Versions.jwt,
+    "com.chatwork"                 %% "scala-jwk"                     % Versions.jwk,
     "dev.zio"                      %% "zio-test"                      % Versions.zio % "test",
     "dev.zio"                      %% "zio-test-sbt"                  % Versions.zio % "test",
     "org.slf4j"                    % "slf4j-nop"                      % "1.7.30",

@@ -7,8 +7,8 @@ import com.snowplowanalytics.schemaci._
 import com.snowplowanalytics.schemaci.entities.Schema
 import com.snowplowanalytics.schemaci.entities.Schema.Key._
 import com.snowplowanalytics.schemaci.errors.CliError
-import com.snowplowanalytics.schemaci.modules.JsonProvider.extractSchemaDependenciesFromManifest
-import com.snowplowanalytics.schemaci.modules.JwtProvider.getAccessToken
+import com.snowplowanalytics.schemaci.modules.JsonProvider._
+import com.snowplowanalytics.schemaci.modules.JwtProvider._
 import com.snowplowanalytics.schemaci.modules.SchemaApiClient.checkSchemaDeployment
 import sttp.client.asynchttpclient.zio.SttpClient
 import zio._
@@ -16,7 +16,6 @@ import zio.console._
 
 case class CheckDeployments(
     manifestPath: String,
-    organizationId: UUID,
     username: String,
     password: String,
     environment: String,
@@ -48,25 +47,24 @@ case class CheckDeployments(
     for {
       schemas  <- extractSchemaDependenciesFromManifest(manifestPath)
       _        <- printInfo(schemas)
-      token    <- getAccessToken(authServerBaseUrl.value, clientId, clientSecret, audience.value, username, password)
-      result   <- verifySchemaDeployment(apiBaseUrl.value, token, organizationId.value, environment, schemas)
+      token    <- getAccessToken(authServerBaseUrl, clientId, clientSecret, audience, username, password)
+      orgId    <- extractOrganizationIdFromToken(authServerBaseUrl, token)
+      result   <- verifySchemaDeployment(apiBaseUrl, token, orgId, environment, schemas)
       exitCode <- result.fold(printSuccess.as(ExitCode.Success))(printError(_).as(ExitCode.Error))
     } yield exitCode
   }
 
   private def verifySchemaDeployment(
-      apiBaseUrl: String,
+      apiBaseUrl: URL,
       token: String,
-      organizationId: String,
+      organizationId: UUID,
       environment: String,
       schemas: List[Schema.Key]
   ): ZIO[SttpClient, CliError, Option[NonEmptyList[Schema.Key]]] =
     ZIO
-      .collectAllParN(5)(
-        schemas.map { schema =>
-          checkSchemaDeployment(apiBaseUrl, token, organizationId, environment, schema)
-            .map(found => Option(schema).filter(_ => !found))
-        }
-      )
+      .foreachParN(5)(schemas) { schema =>
+        checkSchemaDeployment(apiBaseUrl, token, organizationId, environment, schema)
+          .map(found => Option(schema).filter(_ => !found))
+      }
       .map(_.flatten.toNel)
 }

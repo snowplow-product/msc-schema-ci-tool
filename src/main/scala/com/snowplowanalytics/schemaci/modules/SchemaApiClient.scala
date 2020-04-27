@@ -8,6 +8,7 @@ import com.snowplowanalytics.schemaci.entities.Schema
 import com.snowplowanalytics.schemaci.entities.Schema.ValidationResponse
 import com.snowplowanalytics.schemaci.errors.CliError
 import com.snowplowanalytics.schemaci.errors.CliError.Json.ParsingError
+import com.snowplowanalytics.schemaci.{URL, UUID}
 import io.circe._
 import io.circe.generic.auto._
 import sttp.client.{Request, _}
@@ -18,9 +19,9 @@ import zio.{IO, RIO, ZIO}
 
 object SchemaApiClient {
   def validateSchema(
-      apiBaseUrl: String,
+      apiBaseUrl: URL,
       token: String,
-      organizationId: String,
+      organizationId: UUID,
       schema: Json
   ): RIO[SttpClient, ValidationResponse] = {
     val buildRequest: Uri => Request[Either[String, String], Nothing] =
@@ -64,9 +65,9 @@ object SchemaApiClient {
   }
 
   def checkSchemaDeployment(
-      apiBaseUrl: String,
+      apiBaseUrl: URL,
       token: String,
-      organizationId: String,
+      organizationId: UUID,
       environment: String,
       schemaMetadata: Schema.Key
   ): ZIO[SttpClient, CliError, Boolean] = {
@@ -89,12 +90,12 @@ object SchemaApiClient {
       .mapError(CliError.GenericError(s"Uri parsing error: $uri", _))
       .absolve
 
-  private def computeSchemaHash(organizationId: String, meta: Schema.Key): IO[CliError, String] =
+  private def computeSchemaHash(organizationId: UUID, meta: Schema.Key): IO[CliError, String] =
     ZIO
       .effect(
         MessageDigest
           .getInstance("SHA-256")
-          .digest(s"$organizationId-${meta.vendor}-${meta.name}-${meta.format}".getBytes("UTF-8"))
+          .digest(s"${organizationId.value}-${meta.vendor}-${meta.name}-${meta.format}".getBytes("UTF-8"))
           .map("%02x".format(_))
           .mkString
       )

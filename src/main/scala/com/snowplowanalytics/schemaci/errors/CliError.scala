@@ -18,6 +18,9 @@ object CliError {
       override def message: String               = "Invalid user/client credentials"
       override def underlying: Option[Throwable] = none
     }
+    case class InvalidToken(underlying: Option[Throwable]) extends Auth {
+      override def message: String = "Invalid Bearer token"
+    }
   }
 
   sealed abstract class Json extends CliError

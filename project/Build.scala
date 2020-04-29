@@ -26,6 +26,7 @@ object Build {
     "io.circe"                     %% "circe-generic"                 % Versions.circe,
     "io.circe"                     %% "circe-generic-extras"          % Versions.circe,
     "io.circe"                     %% "circe-parser"                  % Versions.circe,
+    "io.circe"                     %% "circe-literal"                 % Versions.circe,
     "org.typelevel"                %% "cats-core"                     % Versions.cats,
     "org.typelevel"                %% "cats-effect"                   % Versions.catsEffect,
     "com.softwaremill.sttp.client" %% "core"                          % Versions.sttp,

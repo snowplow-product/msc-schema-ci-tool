@@ -4,9 +4,8 @@ import cats.syntax.either._
 import com.snowplowanalytics.schemaci.errors.CliError
 import com.snowplowanalytics.schemaci.errors.CliError.Json.ParsingError
 import io.circe.{Json => CJson}
+import izumi.reflect.Tags.TagK
 import sttp.client.{Request, SttpBackend}
-import sttp.client.asynchttpclient.WebSocketHandler
-import sttp.client.asynchttpclient.zio.SttpClient
 import sttp.client.circe.asJsonAlways
 import zio._
 
@@ -27,7 +26,7 @@ object Http {
     ZIO.accessM(_.get[Http.Service].sendRequest(request))
 
   // implementations
-  final class SttpImpl(sttpBackend: SttpBackend[Task, Nothing, WebSocketHandler]) extends Service {
+  final class SttpImpl[WS[_]](sttpBackend: SttpBackend[Task, Nothing, WS]) extends Service {
 
     override def sendRequest[A](request: SttpRequest, extractor: CJson => Either[ParsingError, A]): IO[CliError, A] =
       sendRequest(request)
@@ -46,5 +45,5 @@ object Http {
   }
 
   // layers
-  def sttpLayer: URLayer[SttpClient, Http] = ZLayer.fromService(new SttpImpl(_))
+  def sttpLayer[WS[_]: TagK]: URLayer[SttpClient[WS], Http] = ZLayer.fromService(new SttpImpl[WS](_))
 }

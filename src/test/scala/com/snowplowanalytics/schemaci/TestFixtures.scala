@@ -1,5 +1,6 @@
-package com.snowplowanalytics.schemaci.modules
+package com.snowplowanalytics.schemaci
 
+import com.snowplowanalytics.schemaci.modules.Http
 import com.snowplowanalytics.schemaci.modules.Http.SttpImpl
 import io.circe.{Decoder, Encoder, Printer}
 import io.circe.parser.parse

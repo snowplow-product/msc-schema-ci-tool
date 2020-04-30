@@ -4,7 +4,7 @@ import cats.syntax.either._
 import com.snowplowanalytics.schemaci.errors.CliError
 import com.snowplowanalytics.schemaci.errors.CliError.Json.ParsingError
 import com.snowplowanalytics.schemaci.modules.Http.sendRequest
-import com.snowplowanalytics.schemaci.modules.TestFixtures._
+import com.snowplowanalytics.schemaci.TestFixtures._
 import io.circe.{Json => CJson}
 import io.circe.literal._
 import sttp.client._

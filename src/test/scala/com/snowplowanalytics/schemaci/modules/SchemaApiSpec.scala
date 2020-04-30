@@ -3,7 +3,7 @@ package com.snowplowanalytics.schemaci.modules
 import com.snowplowanalytics.schemaci.{URL, UUID}
 import com.snowplowanalytics.schemaci.entities.Schema
 import com.snowplowanalytics.schemaci.modules.SchemaApi.{checkSchemaDeployment, liveLayer}
-import com.snowplowanalytics.schemaci.modules.TestFixtures._
+import com.snowplowanalytics.schemaci.TestFixtures._
 import eu.timepit.refined.refineMV
 import io.circe.{Json => CJson}
 import io.circe.literal._

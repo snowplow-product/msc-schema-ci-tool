@@ -4,7 +4,7 @@ import com.snowplowanalytics.schemaci.errors.CliError
 import com.snowplowanalytics.schemaci.modules.Jwt._
 import com.snowplowanalytics.schemaci.URL
 import com.snowplowanalytics.schemaci.entities.JwtRequest
-import com.snowplowanalytics.schemaci.modules.TestFixtures._
+import com.snowplowanalytics.schemaci.TestFixtures._
 import eu.timepit.refined._
 import eu.timepit.refined.string.Uuid
 import io.circe.{Json => CJson}

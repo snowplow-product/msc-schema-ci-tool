@@ -5,7 +5,7 @@ import com.snowplowanalytics.schemaci.errors.CliError
 import com.snowplowanalytics.schemaci.errors.CliError.Json.ParsingError
 import com.snowplowanalytics.schemaci.modules.Http.sendRequest
 import com.snowplowanalytics.schemaci.modules.TestFixtures._
-import io.circe.{ Json => CJson }
+import io.circe.{Json => CJson}
 import io.circe.literal._
 import sttp.client._
 import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
@@ -17,9 +17,8 @@ import zio.test.environment.TestEnvironment
 
 object HttpSpec extends DefaultRunnableSpec {
 
-  private def suspendThrow(e: => Throwable): Response[Any] = {
+  private def suspendThrow(e: => Throwable): Response[Any] =
     throw e
-  }
 
   private val throwingBackend: SttpBackendStub[Task, Nothing] =
     AsyncHttpClientZioBackend

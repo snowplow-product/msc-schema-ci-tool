@@ -122,7 +122,7 @@ object JwtSpec extends DefaultRunnableSpec {
         },
         testM("should extract organizationId from a valid token") {
           val token = ExtractOrganizationIdFromTokenFixtures.token
-          val env = ExtractOrganizationIdFromTokenFixtures.serverStub() >>> Jwt.auth0Layer
+          val env   = ExtractOrganizationIdFromTokenFixtures.serverStub() >>> Jwt.auth0Layer
           assertM(
             extractOrganizationIdFromToken(authServerUrl, token).provideCustomLayer(env)
           )(

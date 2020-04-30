@@ -127,7 +127,7 @@ object SchemaApi {
       for {
         schemaHash  <- computeSchemaHash(organizationId, schemaMetadata)
         uri         <- parseUri(s"$basePath/organizations/$organizationId/schemas/$schemaHash/deployments?$filters")
-        deployments <- http.sendRequest(basicRequest.auth.bearer(token).post(uri), extractDeployments)
+        deployments <- http.sendRequest(basicRequest.auth.bearer(token).get(uri), extractDeployments)
       } yield deployments.nonEmpty
     }
 
@@ -142,7 +142,7 @@ object SchemaApi {
         .effect(
           MessageDigest
             .getInstance("SHA-256")
-            .digest(s"${organizationId.value}-${meta.vendor}-${meta.name}-${meta.format}".getBytes("UTF-8"))
+            .digest(s"$organizationId-${meta.vendor}-${meta.name}-${meta.format}".getBytes("UTF-8"))
             .map("%02x".format(_))
             .mkString
         )

@@ -40,7 +40,7 @@ object TestFixtures {
       .whenRequestMatchesPartial {
         case r if r.method == Method.GET && requestMatcher(r) =>
           answer.copy(body = Encoder[B].apply(answer.body).printWith(Printer.noSpaces))
-        case _                      =>
+        case _ =>
           Response("{}", NotFound)
       }
 

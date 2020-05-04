@@ -17,15 +17,14 @@ Currently, it supports one common task:
 You can download schema-ci from our Bintray repository, using the following command:
 
 ```
-curl -L "http://dl.bintray.com/snowplow/snowplow-generic/schema-ci-0.1.0.zip" | jar xv
+curl -L "http://dl.bintray.com/snowplow/snowplow-generic/schema-ci-0.2.0.zip" | jar xv
 ```
 
-In order to be able to perform any task, you need to obtain some credentials and some details for the tool 
-to be able to interact with Schema API. These credentials come in form of an organization id (uuid) and OAuth2 
-client id, client secret, audience, username and password.  
-Refer to [Data Workflow team on Slack](https://appurl.io/Wb0tgBlFO) on how to obtain them.
+In order to be able to perform any task, you need to supply credentials of a user which you will use for CI purposes.
+These credentials come in form of a username and a password which can be obtained by creating an __admin__
+user for your organization from the dedicated Insights UI page.
 
-## CLI
+## Usage
 
 ### Check Deployments
 
@@ -36,10 +35,6 @@ Syntax:
 ```bash
 $ ./schema-ci check \
     --manifestPath /path/to/manifest/snowplow-schemas.json \
-    --organizationId <organization-id> \
-    --clientId <client-id> \
-    --clientSecret <client-secret> \
-    --audience <audience> \
     --username <username> \
     --password <password> \
     --environment DEV
@@ -110,12 +105,14 @@ An example of how a manifest looks like:
 
 ## Development
 
-If you are developing new commands or if you just want to test this tool against Next, just make sure to set these environment
-variables before starting the tool:
+If you are developing new commands or if you just want to test this tool against Next, just make sure to set these 
+environment variables before starting the tool:
 
 ```bash
-export AUTH_SERVER_BASE_URL=https://snowplow-next.eu.auth0.com
 export API_BASE_URL=https://next.console.snowplowanalytics.com
+export AUTH_SERVER_BASE_URL=https://snowplow-next.eu.auth0.com
+export AUTH_CLIENT_ID='<Next client id>'
+export AUTH_CLIENT_SECRET='<Next client secret>'
 ```
 
 [travis-image]: https://travis-ci.com/snowplow-product/msc-schema-ci-tool.svg?token=F4Ce9m1YA8HqgpFQMcL5&branch=master

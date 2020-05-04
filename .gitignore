@@ -26,5 +26,6 @@ project/plugins/project/
 .bloop/
 .metals/
 
-### MacOS
+### Others
 .DS_Store
+.env

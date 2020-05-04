@@ -115,9 +115,9 @@ object Jwt {
 
       (for {
         keys      <- http.sendRequest(request, extractJwkSet)
-        header    <- ZIO.fromTry(JwtCirce.decodeAll(token, JwtOptions(signature = false)).map(_._1))
+        header    <- ZIO.fromTry(JwtCirce.decodeAll(token, JwtOptions(signature = false, expiration = false)).map(_._1))
         rsaKey    <- ZIO.fromEither(getRsaPublicKey(header, keys).toRight(new Exception("Cannot retrieve JWK")))
-        rawClaims <- ZIO.fromTry(JwtCirce.decodeRaw(token, rsaKey))
+        rawClaims <- ZIO.fromTry(JwtCirce.decodeRaw(token, rsaKey, JwtOptions(expiration = false)))
         orgId     <- ZIO.fromEither(extractOrganizationId(rawClaims))
       } yield orgId).mapError(t => CliError.Auth.InvalidToken(t.some))
     }

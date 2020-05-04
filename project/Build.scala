@@ -6,6 +6,7 @@ import sbt.Keys._
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 object Build {
+
   object Versions {
     val zio        = "1.0.0-RC18-2"
     val cats       = "2.0.0"
@@ -25,6 +26,7 @@ object Build {
     "io.circe"                     %% "circe-generic"                 % Versions.circe,
     "io.circe"                     %% "circe-generic-extras"          % Versions.circe,
     "io.circe"                     %% "circe-parser"                  % Versions.circe,
+    "io.circe"                     %% "circe-literal"                 % Versions.circe,
     "org.typelevel"                %% "cats-core"                     % Versions.cats,
     "org.typelevel"                %% "cats-effect"                   % Versions.catsEffect,
     "com.softwaremill.sttp.client" %% "core"                          % Versions.sttp,
@@ -38,7 +40,7 @@ object Build {
     "com.chatwork"                 %% "scala-jwk"                     % Versions.jwk,
     "dev.zio"                      %% "zio-test"                      % Versions.zio % "test",
     "dev.zio"                      %% "zio-test-sbt"                  % Versions.zio % "test",
-    "org.slf4j"                    % "slf4j-nop"                      % "1.7.30",
+    "org.slf4j"                     % "slf4j-nop"                     % "1.7.30",
     compilerPlugin("org.typelevel" %% "kind-projector"     % "0.11.0" cross CrossVersion.full),
     compilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1")
   )
@@ -48,12 +50,12 @@ object Build {
 
     def item(text: String): String = s"${GREEN}▶ ${CYAN}$text${RESET}"
 
-    s"""|Useful sbt tasks:
-        |${item("checkfmt")}      - Check source files formatting using scalafmt
-        |${item("fmt")}           - Formats source files using scalafmt
-        |${item("clean")}         - Clean target directory
-        |${item("test")}          - Run tests
-        |${item("assembly")}      - Package the app as a fat JAR
+    s"""Useful sbt tasks:
+       |${item("checkfmt")}      - Check source files formatting using scalafmt
+       |${item("fmt")}           - Formats source files using scalafmt
+       |${item("clean")}         - Clean target directory
+       |${item("test")}          - Run tests
+       |${item("assembly")}      - Package the app as a fat JAR
       """.stripMargin
   }
 
@@ -70,7 +72,14 @@ object Build {
   )
 
   lazy val sbtBuildInfoSettings: Seq[Setting[_]] = Seq(
-    buildInfoKeys := Seq[BuildInfoKey](name, version, description),
+    buildInfoKeys := Seq[BuildInfoKey](
+      name,
+      version,
+      description,
+      "cid" -> sys.env("SNOWPLOW_API_CLIENT_ID"),
+      "cs"  -> sys.env("SNOWPLOW_API_CLIENT_SECRET")
+    ),
     buildInfoPackage := "com.snowplowanalytics.schemaci"
   )
+
 }

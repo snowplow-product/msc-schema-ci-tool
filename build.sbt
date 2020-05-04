@@ -11,7 +11,8 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Build.dependencies,
     onLoadMessage := Build.welcomeMessage,
     onChangedBuildSource := ReloadOnSourceChanges,
-    resolvers += Resolver.bintrayRepo("snowplow", "snowplow-maven")
+    resolvers += Resolver.bintrayRepo("snowplow", "snowplow-maven"),
+    testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
   )
   .enablePlugins(ScalafmtPlugin, BuildInfoPlugin)
   .settings(Build.sbtAssemblySettings)

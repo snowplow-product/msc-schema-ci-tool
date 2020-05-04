@@ -32,7 +32,7 @@ object Cli {
     val authAudience: Opts[URL] = Opts
       .env[String]("AUTH_AUDIENCE", "Audience of the registered OAuth2 app", "URL")
       .refineToUrl
-      .withDefault("https://snowplowanalytics.com/api/") // This should be set when Auth0 client gets created on Prod
+      .withDefault("https://snowplowanalytics.com/api/")
   }
 
   object Options {

@@ -17,7 +17,7 @@ Currently, it supports one common task:
 You can download schema-ci from our Bintray repository, using the following command:
 
 ```
-curl -L "http://dl.bintray.com/snowplow/snowplow-generic/schema-ci-0.1.0.zip" | jar xv
+curl -L "http://dl.bintray.com/snowplow/snowplow-generic/schema-ci-0.2.0.zip" | jar xv
 ```
 
 In order to be able to perform any task, you need to supply credentials of a user which you will use for CI purposes.
@@ -111,9 +111,8 @@ environment variables before starting the tool:
 ```bash
 export API_BASE_URL=https://next.console.snowplowanalytics.com
 export AUTH_SERVER_BASE_URL=https://snowplow-next.eu.auth0.com
-export AUTH_CLIENT_ID=YCE5aZubvHRZ7hqF0B1XxwRR3cAApu9G
-export AUTH_CLIENT_SECRET=nPbA7bAp8p_0gmClRJCHmUqO5Lv1ky6xSnElAV4oIpesaXzUf9mTcoo5uFZoUHUG
-export AUTH_AUDIENCE=https://snowplowanalytics.com/api/
+export AUTH_CLIENT_ID='<Next client id>'
+export AUTH_CLIENT_SECRET='<Next client secret>'
 ```
 
 [travis-image]: https://travis-ci.com/snowplow-product/msc-schema-ci-tool.svg?token=F4Ce9m1YA8HqgpFQMcL5&branch=master

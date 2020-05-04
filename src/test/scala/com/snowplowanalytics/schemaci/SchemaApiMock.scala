@@ -1,11 +1,12 @@
 package com.snowplowanalytics.schemaci
 
+import io.circe.{Json => CJson}
+import zio.test.mock.{Method, Proxy}
+import zio.{Has, IO, URLayer, ZLayer}
+
 import com.snowplowanalytics.schemaci.entities.Schema
 import com.snowplowanalytics.schemaci.errors.CliError
 import com.snowplowanalytics.schemaci.modules.SchemaApi
-import io.circe.{Json => CJson}
-import zio.{Has, IO, URLayer, ZLayer}
-import zio.test.mock.{Method, Proxy}
 
 object SchemaApiMock {
 

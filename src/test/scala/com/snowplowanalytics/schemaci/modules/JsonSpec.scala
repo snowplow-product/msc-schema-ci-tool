@@ -1,13 +1,14 @@
 package com.snowplowanalytics.schemaci.modules
 
+import scala.io.Source
+
+import zio.test.Assertion._
+import zio.test._
+import zio.test.environment.TestEnvironment
+
 import com.snowplowanalytics.schemaci.entities.Schema
 import com.snowplowanalytics.schemaci.errors.CliError
 import com.snowplowanalytics.schemaci.modules.Json.{circeLayer, extractSchemaDependenciesFromManifest}
-import zio.test._
-import zio.test.Assertion._
-import zio.test.environment.TestEnvironment
-
-import scala.io.Source
 
 object JsonSpec extends DefaultRunnableSpec {
 

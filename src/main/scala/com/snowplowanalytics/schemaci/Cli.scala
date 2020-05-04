@@ -3,8 +3,9 @@ package com.snowplowanalytics.schemaci
 import cats.implicits._
 import com.github.j5ik2o.base64scala.Base64String
 import com.monovore.decline.Opts
-import com.snowplowanalytics.schemaci.commands.CheckDeployments
 import eu.timepit.refined.auto._
+
+import com.snowplowanalytics.schemaci.commands.CheckDeployments
 
 object Cli {
 
@@ -33,6 +34,7 @@ object Cli {
       .env[String]("AUTH_AUDIENCE", "Audience of the registered OAuth2 app", "URL")
       .refineToUrl
       .withDefault("https://snowplowanalytics.com/api/")
+
   }
 
   object Options {

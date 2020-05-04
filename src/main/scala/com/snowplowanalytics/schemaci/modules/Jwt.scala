@@ -3,22 +3,23 @@ package com.snowplowanalytics.schemaci.modules
 import java.security.PublicKey
 
 import cats.implicits._
-import com.chatwork.scala.jwk.{JWK, JWKSet, KeyId, RSAJWK}
 import com.chatwork.scala.jwk.JWSAlgorithmType.AlgorithmFamily._
-import com.snowplowanalytics.schemaci.{URL, UUID}
+import com.chatwork.scala.jwk.{JWK, JWKSet, KeyId, RSAJWK}
+import eu.timepit.refined.refineV
+import eu.timepit.refined.string.Uuid
+import io.circe.parser._
+import io.circe.{Json => CJson}
+import pdi.jwt.{JwtCirce, JwtHeader, JwtOptions}
+import sttp.client._
+import sttp.client.circe._
+import zio._
+
 import com.snowplowanalytics.schemaci.entities.JwtRequest
 import com.snowplowanalytics.schemaci.errors.CliError
 import com.snowplowanalytics.schemaci.errors.CliError.Auth.InvalidCredentials
 import com.snowplowanalytics.schemaci.errors.CliError.Json.ParsingError
 import com.snowplowanalytics.schemaci.modules.Http.SttpRequest
-import eu.timepit.refined.refineV
-import eu.timepit.refined.string.Uuid
-import io.circe.{Json => CJson}
-import io.circe.parser._
-import pdi.jwt.{JwtCirce, JwtHeader, JwtOptions}
-import sttp.client._
-import sttp.client.circe._
-import zio._
+import com.snowplowanalytics.schemaci.{URL, UUID}
 
 object Jwt {
 

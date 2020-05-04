@@ -1,13 +1,14 @@
 package com.snowplowanalytics.schemaci.modules
 
 import cats.syntax.either._
-import com.snowplowanalytics.schemaci.errors.CliError
-import com.snowplowanalytics.schemaci.errors.CliError.Json.ParsingError
 import io.circe.{Json => CJson}
 import izumi.reflect.Tags.TagK
-import sttp.client.{Request, SttpBackend}
 import sttp.client.circe.asJsonAlways
+import sttp.client.{Request, SttpBackend}
 import zio._
+
+import com.snowplowanalytics.schemaci.errors.CliError
+import com.snowplowanalytics.schemaci.errors.CliError.Json.ParsingError
 
 object Http {
   type SttpRequest = Request[Either[String, String], Nothing]

@@ -2,15 +2,16 @@ package com.snowplowanalytics.schemaci
 
 import cats.effect.ExitCode
 import cats.implicits._
-import com.monovore.decline.effect.CommandIOApp
 import com.monovore.decline.Opts
-import com.snowplowanalytics.schemaci.BuildInfo._
-import com.snowplowanalytics.schemaci.modules._
-import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
+import com.monovore.decline.effect.CommandIOApp
 import sttp.client.asynchttpclient.WebSocketHandler
+import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
 import zio._
 import zio.console.putStrLn
 import zio.interop.catz._
+
+import com.snowplowanalytics.schemaci.BuildInfo._
+import com.snowplowanalytics.schemaci.modules._
 
 object Main extends App {
 

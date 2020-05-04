@@ -1,9 +1,10 @@
-import sbtassembly.AssemblyPlugin.autoImport._
-import sbtassembly.AssemblyPlugin.defaultShellScript
 import sbt._
 import sbt.librarymanagement.ModuleID
 import sbt.Keys._
+import sbtassembly.AssemblyPlugin.autoImport._
+import sbtassembly.AssemblyPlugin.defaultShellScript
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
+import scalafix.sbt.ScalafixPlugin.autoImport.scalafixSemanticdb
 
 object Build {
 
@@ -42,7 +43,12 @@ object Build {
     "dev.zio"                      %% "zio-test-sbt"                  % Versions.zio % "test",
     "org.slf4j"                     % "slf4j-nop"                     % "1.7.30",
     compilerPlugin("org.typelevel" %% "kind-projector"     % "0.11.0" cross CrossVersion.full),
-    compilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1")
+    compilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1"),
+    compilerPlugin(scalafixSemanticdb)
+  )
+
+  val scalafixDependencies: Seq[ModuleID] = Seq(
+    "com.nequissimus" %% "sort-imports" % "0.5.0"
   )
 
   val welcomeMessage: String = {
@@ -76,8 +82,8 @@ object Build {
       name,
       version,
       description,
-      "cid" -> sys.env("SNOWPLOW_API_CLIENT_ID"),
-      "cs"  -> sys.env("SNOWPLOW_API_CLIENT_SECRET")
+      "cid" -> sys.env.getOrElse("SNOWPLOW_API_CLIENT_ID", ""),
+      "cs"  -> sys.env.getOrElse("SNOWPLOW_API_CLIENT_SECRET", "")
     ),
     buildInfoPackage := "com.snowplowanalytics.schemaci"
   )

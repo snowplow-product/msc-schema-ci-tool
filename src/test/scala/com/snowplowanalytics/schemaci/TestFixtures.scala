@@ -1,15 +1,16 @@
 package com.snowplowanalytics.schemaci
 
-import com.snowplowanalytics.schemaci.modules.Http
-import com.snowplowanalytics.schemaci.modules.Http.SttpImpl
-import io.circe.{Decoder, Encoder, Printer}
 import io.circe.parser.parse
-import sttp.client.{NothingT, Request, Response, StringBody}
+import io.circe.{Decoder, Encoder, Printer}
 import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
 import sttp.client.testing.SttpBackendStub
-import sttp.model.{MediaType, Method}
+import sttp.client.{NothingT, Request, Response, StringBody}
 import sttp.model.StatusCode.{BadRequest, NotFound}
+import sttp.model.{MediaType, Method}
 import zio.{Task, ULayer, ZLayer}
+
+import com.snowplowanalytics.schemaci.modules.Http
+import com.snowplowanalytics.schemaci.modules.Http.SttpImpl
 
 object TestFixtures {
 

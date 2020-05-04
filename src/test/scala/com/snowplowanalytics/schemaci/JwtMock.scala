@@ -1,9 +1,10 @@
 package com.snowplowanalytics.schemaci
 
+import zio.test.mock.{Method, Proxy}
+import zio.{Has, IO, URLayer, ZLayer}
+
 import com.snowplowanalytics.schemaci.errors.CliError
 import com.snowplowanalytics.schemaci.modules.Jwt
-import zio.{Has, IO, URLayer, ZLayer}
-import zio.test.mock.{Method, Proxy}
 
 object JwtMock {
 

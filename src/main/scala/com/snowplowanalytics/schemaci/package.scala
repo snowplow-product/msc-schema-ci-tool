@@ -2,13 +2,14 @@ package com.snowplowanalytics
 
 import cats.implicits._
 import com.monovore.decline.Opts
-import com.snowplowanalytics.schemaci.errors.CliError
-import com.snowplowanalytics.schemaci.modules._
 import eu.timepit.refined._
 import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.string.{Url, Uuid}
 import zio.ZIO
 import zio.console.Console
+
+import com.snowplowanalytics.schemaci.errors.CliError
+import com.snowplowanalytics.schemaci.modules._
 
 package object schemaci {
   type CliEnv     = Console with Json with Jwt with SchemaApi

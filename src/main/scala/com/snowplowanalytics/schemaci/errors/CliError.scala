@@ -1,8 +1,9 @@
 package com.snowplowanalytics.schemaci.errors
 
 import cats.syntax.option._
-import com.snowplowanalytics.iglu.core.ParseError
 import io.circe
+
+import com.snowplowanalytics.iglu.core.ParseError
 
 sealed abstract class CliError extends Exception with Product with Serializable {
   def message: String

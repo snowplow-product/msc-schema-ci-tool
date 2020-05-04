@@ -1,19 +1,20 @@
 package com.snowplowanalytics.schemaci.modules
 
-import com.snowplowanalytics.schemaci.{URL, UUID}
-import com.snowplowanalytics.schemaci.entities.Schema
-import com.snowplowanalytics.schemaci.modules.SchemaApi.{checkSchemaDeployment, liveLayer}
-import com.snowplowanalytics.schemaci.TestFixtures._
 import eu.timepit.refined.refineMV
-import io.circe.{Json => CJson}
 import io.circe.literal._
+import io.circe.{Json => CJson}
 import sttp.client.{Request, Response}
 import sttp.model.Header
 import sttp.model.Uri.QuerySegment
-import zio.test._
 import zio.ULayer
 import zio.test.Assertion._
+import zio.test._
 import zio.test.environment.TestEnvironment
+
+import com.snowplowanalytics.schemaci.TestFixtures._
+import com.snowplowanalytics.schemaci.entities.Schema
+import com.snowplowanalytics.schemaci.modules.SchemaApi.{checkSchemaDeployment, liveLayer}
+import com.snowplowanalytics.schemaci.{URL, UUID}
 
 object SchemaApiSpec extends DefaultRunnableSpec {
 

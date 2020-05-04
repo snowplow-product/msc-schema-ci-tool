@@ -1,20 +1,21 @@
 package com.snowplowanalytics.schemaci.commands
 
+import scala.io.Source
+
 import cats.effect.ExitCode
+import eu.timepit.refined._
+import zio.ULayer
+import zio.test.Assertion._
+import zio.test._
+import zio.test.environment.TestEnvironment
+import zio.test.mock.Expectation._
+
 import com.snowplowanalytics.schemaci.JsonMock._
 import com.snowplowanalytics.schemaci.JwtMock._
 import com.snowplowanalytics.schemaci.SchemaApiMock._
-import com.snowplowanalytics.schemaci.{URL, UUID}
 import com.snowplowanalytics.schemaci.entities.Schema
 import com.snowplowanalytics.schemaci.modules.{Json, Jwt, SchemaApi}
-import eu.timepit.refined._
-import zio.test._
-import zio.test.environment.TestEnvironment
-import zio.test.Assertion._
-import zio.ULayer
-import zio.test.mock.Expectation._
-
-import scala.io.Source
+import com.snowplowanalytics.schemaci.{URL, UUID}
 
 object CheckDeploymentsSpec extends DefaultRunnableSpec {
 

@@ -1,23 +1,24 @@
 package com.snowplowanalytics.schemaci.modules
 
-import com.snowplowanalytics.schemaci.errors.CliError
-import com.snowplowanalytics.schemaci.modules.Jwt._
-import com.snowplowanalytics.schemaci.URL
-import com.snowplowanalytics.schemaci.entities.JwtRequest
-import com.snowplowanalytics.schemaci.TestFixtures._
+import scala.io.Source
+
 import eu.timepit.refined._
 import eu.timepit.refined.string.Uuid
-import io.circe.{Json => CJson}
 import io.circe.literal._
 import io.circe.parser._
+import io.circe.{Json => CJson}
 import sttp.client.{Request, Response}
 import sttp.model.StatusCode._
-import zio.test._
-import zio.test.Assertion._
-import zio.test.environment.TestEnvironment
 import zio.ULayer
+import zio.test.Assertion._
+import zio.test._
+import zio.test.environment.TestEnvironment
 
-import scala.io.Source
+import com.snowplowanalytics.schemaci.TestFixtures._
+import com.snowplowanalytics.schemaci.URL
+import com.snowplowanalytics.schemaci.entities.JwtRequest
+import com.snowplowanalytics.schemaci.errors.CliError
+import com.snowplowanalytics.schemaci.modules.Jwt._
 
 object JwtSpec extends DefaultRunnableSpec {
 

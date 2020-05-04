@@ -1,21 +1,22 @@
 package com.snowplowanalytics.schemaci.modules
 
+import scala.io.Source
+
 import cats.implicits._
-import com.snowplowanalytics.iglu.client.{CirceValidator, Client, ClientError, Resolver}
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.{Json => CJson}
+import zio._
+import zio.interop.catz._
+import zio.interop.catz.implicits._
+
 import com.snowplowanalytics.iglu.client.resolver.registries.Registry.{parse => _, _}
+import com.snowplowanalytics.iglu.client.{CirceValidator, Client, ClientError, Resolver}
 import com.snowplowanalytics.iglu.core.SelfDescribingData
 import com.snowplowanalytics.iglu.core.circe.implicits._
 import com.snowplowanalytics.schemaci.entities.Schema
 import com.snowplowanalytics.schemaci.errors.CliError
 import com.snowplowanalytics.schemaci.errors.CliError.Json.ParsingError
-import io.circe.{Json => CJson}
-import io.circe.generic.auto._
-import io.circe.parser._
-import zio._
-import zio.interop.catz._
-import zio.interop.catz.implicits._
-
-import scala.io.Source
 
 object Json {
 

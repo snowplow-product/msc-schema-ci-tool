@@ -1,8 +1,13 @@
 package com.snowplowanalytics.schemaci.commands
 
+import scala.io.Source
+
 import cats.data.NonEmptyList
 import cats.effect.ExitCode
 import cats.implicits._
+import zio._
+import zio.console._
+
 import com.snowplowanalytics.schemaci._
 import com.snowplowanalytics.schemaci.entities.Schema
 import com.snowplowanalytics.schemaci.entities.Schema.Key._
@@ -11,10 +16,6 @@ import com.snowplowanalytics.schemaci.modules.Json._
 import com.snowplowanalytics.schemaci.modules.Jwt._
 import com.snowplowanalytics.schemaci.modules.SchemaApi
 import com.snowplowanalytics.schemaci.modules.SchemaApi.checkSchemaDeployment
-import zio._
-import zio.console._
-
-import scala.io.Source
 
 case class CheckDeployments(
   manifestPath: String,

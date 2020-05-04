@@ -4,18 +4,19 @@ import java.security.MessageDigest
 
 import cats.data.NonEmptyList
 import cats.implicits._
-import com.snowplowanalytics.schemaci.{URL, UUID}
+import io.circe.generic.auto._
+import io.circe.{Json => CJson, _}
+import sttp.client._
+import sttp.client.circe._
+import sttp.model.Uri
+import zio.{IO, URLayer, ZIO, ZLayer}
+
 import com.snowplowanalytics.schemaci.entities.Schema
 import com.snowplowanalytics.schemaci.entities.Schema.ValidationResponse
 import com.snowplowanalytics.schemaci.errors.CliError
 import com.snowplowanalytics.schemaci.errors.CliError.Json.ParsingError
 import com.snowplowanalytics.schemaci.modules.Http.SttpRequest
-import io.circe.{Json => CJson, _}
-import io.circe.generic.auto._
-import sttp.client._
-import sttp.client.circe._
-import sttp.model.Uri
-import zio.{IO, URLayer, ZIO, ZLayer}
+import com.snowplowanalytics.schemaci.{URL, UUID}
 
 object SchemaApi {
 

@@ -67,7 +67,7 @@ object Build {
 
   lazy val sbtAssemblySettings: Seq[Setting[_]] = Seq(
     assemblyJarName in assembly := { name.value },
-    mainClass in assembly := Some("com.snowplowanalytics.schemaci.Main"),
+    mainClass in assembly := Some("com.snowplowanalytics.datastructures.ci.Main"),
     assemblyOption in assembly ~= { _.copy(prependShellScript = Some(defaultShellScript)) },
     crossPaths := false,
     test in assembly := {},
@@ -85,7 +85,7 @@ object Build {
       "cid" -> sys.env.getOrElse("SNOWPLOW_API_CLIENT_ID", ""),
       "cs"  -> sys.env.getOrElse("SNOWPLOW_API_CLIENT_SECRET", "")
     ),
-    buildInfoPackage := "com.snowplowanalytics.schemaci"
+    buildInfoPackage := "com.snowplowanalytics.datastructures.ci"
   )
 
 }

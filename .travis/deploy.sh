@@ -7,7 +7,7 @@ tag=$1
 cd "${TRAVIS_BUILD_DIR}"
 export TRAVIS_BUILD_RELEASE_TAG="${tag}"
 
-echo "DEPLOY: starting schema-ci deploy for version $TRAVIS_BUILD_RELEASE_TAG..."
+echo "DEPLOY: starting data-structures-ci deploy for version $TRAVIS_BUILD_RELEASE_TAG..."
 
 release-manager \
     --config "./.travis/release.yml" \
@@ -16,4 +16,4 @@ release-manager \
     --make-artifact \
     --upload-artifact
 
-echo "DEPLOY: schema-ci deployed..."
+echo "DEPLOY: data-structures-ci deployed..."

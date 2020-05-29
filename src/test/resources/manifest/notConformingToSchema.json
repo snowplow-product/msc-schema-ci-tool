@@ -1,5 +1,5 @@
 {
-  "schema": "iglu:com.snowplowanalytics.schemaci/schema_dependencies/jsonschema/1-0-0",
+  "schema": "iglu:com.snowplowanalytics.insights/data_structures_dependencies/jsonschema/1-0-0",
   "data": {
     "schemas": [
       {

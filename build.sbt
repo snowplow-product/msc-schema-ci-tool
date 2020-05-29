@@ -1,13 +1,16 @@
-addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt; compile:scalafix; test:scalafix")
+addCommandAlias(
+  "fmt",
+  "scalafix RemoveUnused; test:scalafix RemoveUnused; all scalafix test:scalafix; all scalafmtSbt scalafmt test:scalafmt"
+)
 addCommandAlias(
   "checkfmt",
-  "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck; compile:scalafix --check; test:scalafix --check"
+  "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck; all compile:scalafix --check; all test:scalafix --check;"
 )
 
 lazy val root = (project in file("."))
   .settings(
     organization := "com.snowplowanalytics",
-    name := "schema-ci",
+    name := "data-structures-ci",
     description := "A CLI helper tool for common CI/CD scenarios when developing Snowplow Schemas",
     version := "0.2.0",
     scalaVersion := "2.12.11",

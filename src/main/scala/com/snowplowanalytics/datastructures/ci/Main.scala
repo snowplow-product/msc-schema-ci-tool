@@ -23,10 +23,10 @@ object Main extends App {
       .catchAll(t => putStrLn(Console.RED + t.getMessage + Console.RESET).as(1))
 
   def wireCliEnv: ULayer[DataStructuresApi with Jwt with Json] = {
-    val http      = AsyncHttpClientZioBackend.layer().orDie >>> Http.sttpLayer[WebSocketHandler]
+    val http              = AsyncHttpClientZioBackend.layer().orDie >>> Http.sttpLayer[WebSocketHandler]
     val dataStructuresApi = http >>> DataStructuresApi.liveLayer
-    val jwt       = http >>> Jwt.auth0Layer
-    val json      = Json.circeLayer
+    val jwt               = http >>> Jwt.auth0Layer
+    val json              = Json.circeLayer
 
     dataStructuresApi ++ jwt ++ json
   }

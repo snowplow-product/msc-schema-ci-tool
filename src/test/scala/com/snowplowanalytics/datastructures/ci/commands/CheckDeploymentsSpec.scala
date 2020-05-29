@@ -1,18 +1,20 @@
 package com.snowplowanalytics.datastructures.ci.commands
 
 import scala.io.Source
+
 import cats.effect.ExitCode
-import com.snowplowanalytics.datastructures.ci.entities.Schema.Key
 import eu.timepit.refined._
 import zio.ULayer
 import zio.test.Assertion._
 import zio.test._
 import zio.test.environment.TestEnvironment
 import zio.test.mock.Expectation._
+
+import com.snowplowanalytics.datastructures.ci.DataStructuresApiMock._
 import com.snowplowanalytics.datastructures.ci.JsonMock._
 import com.snowplowanalytics.datastructures.ci.JwtMock._
-import com.snowplowanalytics.datastructures.ci.DataStructuresApiMock._
 import com.snowplowanalytics.datastructures.ci.entities.Schema
+import com.snowplowanalytics.datastructures.ci.entities.Schema.Key
 import com.snowplowanalytics.datastructures.ci.modules.{DataStructuresApi, Json, Jwt}
 import com.snowplowanalytics.datastructures.ci.{URL, UUID}
 
@@ -46,8 +48,8 @@ object CheckDeploymentsSpec extends DefaultRunnableSpec {
         )
 
         val schemas: List[Key] = List(Schema.Key("com.vendor", "name", "jsonschema", "1-0-0"))
-        val token: String             = "token"
-        val orgId: UUID               = refineMV("18d4080d-b1c7-4d33-979d-3fd4be734cfb")
+        val token: String      = "token"
+        val orgId: UUID        = refineMV("18d4080d-b1c7-4d33-979d-3fd4be734cfb")
 
         val mockEnv: ULayer[Json with Jwt with DataStructuresApi] =
           (ExtractSchemaDependenciesFromManifest(

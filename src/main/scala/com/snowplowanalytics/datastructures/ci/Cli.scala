@@ -4,6 +4,7 @@ import cats.implicits._
 import com.github.j5ik2o.base64scala.Base64String
 import com.monovore.decline.Opts
 import eu.timepit.refined.auto._
+
 import com.snowplowanalytics.datastructures.ci.commands.CheckDeployments
 
 object Cli {

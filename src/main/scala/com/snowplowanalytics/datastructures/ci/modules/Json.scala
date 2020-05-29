@@ -10,13 +10,13 @@ import zio._
 import zio.interop.catz._
 import zio.interop.catz.implicits._
 
+import com.snowplowanalytics.datastructures.ci.entities.Schema
+import com.snowplowanalytics.datastructures.ci.errors.CliError
+import com.snowplowanalytics.datastructures.ci.errors.CliError.Json.ParsingError
 import com.snowplowanalytics.iglu.client.resolver.registries.Registry.{parse => _, _}
 import com.snowplowanalytics.iglu.client.{CirceValidator, Client, ClientError, Resolver}
 import com.snowplowanalytics.iglu.core.SelfDescribingData
 import com.snowplowanalytics.iglu.core.circe.implicits._
-import com.snowplowanalytics.datastructures.ci.entities.Schema
-import com.snowplowanalytics.datastructures.ci.errors.CliError
-import com.snowplowanalytics.datastructures.ci.errors.CliError.Json.ParsingError
 
 object Json {
 
@@ -46,7 +46,7 @@ object Json {
         jsonString <- readFileToString(source)
         json       <- parseJson(jsonString)
         manifest   <- parseSelfDescribingJsonData(json)
-        client      = Client[Task, CJson](Resolver(List(EmbeddedRegistry), None), CirceValidator)
+        client      = Client[Task, CJson](Resolver(List(IgluCentral), None), CirceValidator)
         _          <- client.check(manifest).leftMap(mapValidationError).value.mapError(mapResolutionError).absolve
         schemaKeys <- schemaKeys(manifest.data)
       } yield schemaKeys

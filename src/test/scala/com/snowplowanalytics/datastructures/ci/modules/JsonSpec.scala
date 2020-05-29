@@ -1,11 +1,12 @@
 package com.snowplowanalytics.datastructures.ci.modules
 
-import com.snowplowanalytics.datastructures.ci.entities.Schema
-
 import scala.io.Source
+
 import zio.test.Assertion._
 import zio.test._
 import zio.test.environment.TestEnvironment
+
+import com.snowplowanalytics.datastructures.ci.entities.Schema
 import com.snowplowanalytics.datastructures.ci.entities.Schema
 import com.snowplowanalytics.datastructures.ci.errors.CliError
 import com.snowplowanalytics.datastructures.ci.modules.Json.{circeLayer, extractSchemaDependenciesFromManifest}

@@ -12,10 +12,10 @@ import com.snowplowanalytics.datastructures.ci._
 import com.snowplowanalytics.datastructures.ci.entities.Schema
 import com.snowplowanalytics.datastructures.ci.entities.Schema.Key._
 import com.snowplowanalytics.datastructures.ci.errors.CliError
-import com.snowplowanalytics.datastructures.ci.modules.Json._
-import com.snowplowanalytics.datastructures.ci.modules.Jwt._
 import com.snowplowanalytics.datastructures.ci.modules.DataStructuresApi
 import com.snowplowanalytics.datastructures.ci.modules.DataStructuresApi.checkSchemaDeployment
+import com.snowplowanalytics.datastructures.ci.modules.Json._
+import com.snowplowanalytics.datastructures.ci.modules.Jwt._
 
 case class CheckDeployments(
   manifestPath: String,

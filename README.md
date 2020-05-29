@@ -76,8 +76,8 @@ export AUTH_CLIENT_SECRET='<Next client secret>'
 [travis-image]: https://travis-ci.com/snowplow-product/msc-schema-ci-tool.svg?token=F4Ce9m1YA8HqgpFQMcL5&branch=master
 [travis]: https://travis-ci.com/snowplow-product/msc-schema-ci-tool
 
-[bintray-image]: https://api.bintray.com/packages/snowplow/snowplow-generic/schema-ci/images/download.svg
-[bintray]: https://bintray.com/snowplow/snowplow-generic/schema-ci/_latestVersion
+[bintray-image]: https://api.bintray.com/packages/snowplow/snowplow-generic/data-structures-ci/images/download.svg
+[bintray]: https://bintray.com/snowplow/snowplow-generic/data-structures-ci/_latestVersion
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
 [license]: http://www.apache.org/licenses/LICENSE-2.0

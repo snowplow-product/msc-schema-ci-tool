@@ -41,51 +41,8 @@ $ ./data-structures-ci check \
     --environment DEV
 ```
 
-The manifest must adhere to the following Self Describing JSON Schema: 
-```yaml
-{
-  "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
-  "description": "Schema for recording schema dependencies",
-  "self": {
-    "vendor": "com.snowplowanalytics.insights",
-    "name": "data_structures_dependencies",
-    "format": "jsonschema",
-    "version": "1-0-0"
-  },
-  "type": "object",
-  "properties": {
-    "schemas": {
-      "type": "array",
-      "description": "An array of schema dependencies",
-      "items": {
-        "type": "object",
-        "properties": {
-          "vendor": {
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9-_.]+$"
-          },
-          "name": {
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9-_]+$"
-          },
-          "format": {
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9-_]+$"
-          },
-          "version": {
-            "type": "string",
-            "pattern": "^[0-9]+-[0-9]+-[0-9]+$"
-          }
-        },
-        "required": ["vendor", "name", "format", "version"],
-        "additionalProperties": false
-      }
-    }
-  },
-  "additionalProperties": false,
-  "required": ["schemas"]
-}
-```
+The manifest must adhere to the following Self Describing JSON Schema, published to Iglu Central:
+http://iglucentral.com/schemas/com.snowplowanalytics.insights/data_structures_dependencies/jsonschema/1-0-0
 
 An example of how a manifest looks like:
 ```yaml

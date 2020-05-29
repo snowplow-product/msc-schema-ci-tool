@@ -7,7 +7,7 @@ scala:
 jdk:
   - openjdk8
 script:
-  - sbt +test
+  - sbt test
 
 before_cache:
   - rm -fv $HOME/.ivy2/.sbt.ivy.lock

@@ -18,7 +18,7 @@ Currently, it supports one common task:
 You can download schema-ci from our Bintray repository, using the following command:
 
 ```
-curl -L "http://dl.bintray.com/snowplow/snowplow-generic/data-structures-ci-0.2.0.zip" | jar xv
+curl -L "http://dl.bintray.com/snowplow/snowplow-generic/data-structures-ci-0.3.0.zip" | jar xv
 ```
 
 In order to be able to perform any task, you need to supply credentials of a user which you will use for CI purposes.

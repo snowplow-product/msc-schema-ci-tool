@@ -29,3 +29,4 @@ project/plugins/project/
 ### Others
 .DS_Store
 .env
+.envrc

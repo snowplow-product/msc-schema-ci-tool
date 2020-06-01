@@ -14,11 +14,13 @@ packages:
     name     : "data-structures-ci"
     user_org : "snowplow"
     publish  : true
-    override : false
+    override : true
     continue_on_conflict : false
     version  : <%= FUNC['sbt_version(.)'] %>
     build_version : <%= ENV['TRAVIS_BUILD_RELEASE_TAG'] %>
     build_commands:
+      - export SNOWPLOW_API_CLIENT_ID=<%= ENV['SNOWPLOW_API_CLIENT_ID'] %>
+      - export SNOWPLOW_API_CLIENT_SECRET=<%= ENV['SNOWPLOW_API_CLIENT_SECRET'] %>
       - sbt assembly
 
     # Required: Artifact

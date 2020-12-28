@@ -13,8 +13,10 @@ import zio.interop.catz.implicits._
 import com.snowplowanalytics.datastructures.ci.entities.Schema
 import com.snowplowanalytics.datastructures.ci.errors.CliError
 import com.snowplowanalytics.datastructures.ci.errors.CliError.Json.ParsingError
+import com.snowplowanalytics.iglu.client.resolver.Resolver
 import com.snowplowanalytics.iglu.client.resolver.registries.Registry.{parse => _, _}
-import com.snowplowanalytics.iglu.client.{CirceValidator, Client, ClientError, Resolver}
+import com.snowplowanalytics.iglu.client.validator.CirceValidator
+import com.snowplowanalytics.iglu.client.{Client, ClientError}
 import com.snowplowanalytics.iglu.core.SelfDescribingData
 import com.snowplowanalytics.iglu.core.circe.implicits._
 
@@ -34,7 +36,7 @@ object Json {
     override def extractSchemaDependenciesFromManifest(source: => Source): IO[CliError, List[Schema.Key]] = {
       val mapValidationError: ClientError => CliError =
         c => ParsingError("Manifest validation failed", new Exception(c.getMessage).some)
-      val mapResolutionError: Throwable => CliError =
+      val mapResolutionError: Throwable => CliError   =
         t => ParsingError("Manifest schema resolution failed", t.some)
 
       val schemaKeys: CJson => IO[CliError, List[Schema.Key]] = data =>
@@ -64,8 +66,8 @@ object Json {
 
     private def readFileToString(source: => Source): IO[CliError, String] =
       ZIO
-        .bracket(Task.effect(source))(s => Task.effect(s.close()).ignore)(s => Task.effect(s.getLines.mkString))
-        .mapError(CliError.GenericError(s"Cannot open/read ${source.descr}", _))
+        .bracket(Task.effect(source))(s => Task.effect(s.close()).ignore)(s => Task.effect(s.getLines().mkString))
+        .mapError(CliError.GenericError(s"Cannot open/read source", _))
 
   }
 

@@ -4,9 +4,11 @@ import cats.syntax.either._
 import io.circe.literal._
 import io.circe.{Json => CJson}
 import sttp.client._
+import sttp.client.asynchttpclient.WebSocketHandler
 import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
 import sttp.client.testing.SttpBackendStub
 import zio.Task
+import zio.stream._
 import zio.test.Assertion._
 import zio.test._
 import zio.test.environment.TestEnvironment
@@ -21,19 +23,19 @@ object HttpSpec extends DefaultRunnableSpec {
   private def suspendThrow(e: => Throwable): Response[Any] =
     throw e
 
-  private val throwingBackend: SttpBackendStub[Task, Nothing] =
+  private val throwingBackend: SttpBackendStub[Task, Stream[Throwable, Byte], WebSocketHandler] =
     AsyncHttpClientZioBackend
       .stub
       .whenAnyRequest
       .thenRespond(suspendThrow(new SttpClientException.ConnectException(new RuntimeException)))
 
-  private val nonJsonBackend: SttpBackendStub[Task, Nothing] =
+  private val nonJsonBackend: SttpBackendStub[Task, Stream[Throwable, Byte], WebSocketHandler] =
     AsyncHttpClientZioBackend
       .stub
       .whenAnyRequest
       .thenRespond("plaintext")
 
-  private val jsonBackend: SttpBackendStub[Task, Nothing] =
+  private val jsonBackend: SttpBackendStub[Task, Stream[Throwable, Byte], WebSocketHandler] =
     sttpBackendStubForGet(_ => true, Response.ok(json"""{ "key": "value" }"""))
 
   override def spec: ZSpec[TestEnvironment, Any] =
@@ -56,7 +58,7 @@ object HttpSpec extends DefaultRunnableSpec {
           )
         },
         testM("should be able to deserialize portions of response given an extractor") {
-          val request = basicRequest.get(uri"https://example.com")
+          val request                                          = basicRequest.get(uri"https://example.com")
           val extractor: CJson => Either[ParsingError, String] =
             _.hcursor.get[String]("key").leftMap(CliError.Json.ParsingError("fail", _))
           assertM(

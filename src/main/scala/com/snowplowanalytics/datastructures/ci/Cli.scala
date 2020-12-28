@@ -74,5 +74,5 @@ object Cli {
 
   }
 
-  private val decode: String => String = Base64String(_, urlSafe = true).decodeToString.right.get
+  private val decode: String => String = Base64String(_, urlSafe = true).decodeToString.getOrElse("")
 }

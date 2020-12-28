@@ -26,12 +26,12 @@ object Jwt {
   trait Service {
 
     def getAccessToken(
-      authServerBaseUrl: URL,
-      clientId: String,
-      clientSecret: String,
-      audience: URL,
-      username: String,
-      password: String
+        authServerBaseUrl: URL,
+        clientId: String,
+        clientSecret: String,
+        audience: URL,
+        username: String,
+        password: String
     ): IO[CliError, String]
 
     def extractOrganizationIdFromToken(authServerBaseUrl: URL, token: String): IO[CliError, UUID]
@@ -39,12 +39,12 @@ object Jwt {
 
   // accessors
   def getAccessToken(
-    authServerBaseUrl: URL,
-    clientId: String,
-    clientSecret: String,
-    audience: URL,
-    username: String,
-    password: String
+      authServerBaseUrl: URL,
+      clientId: String,
+      clientSecret: String,
+      audience: URL,
+      username: String,
+      password: String
   ): ZIO[Jwt, CliError, String] =
     ZIO.accessM(
       _.get[Jwt.Service].getAccessToken(authServerBaseUrl, clientId, clientSecret, audience, username, password)
@@ -57,12 +57,12 @@ object Jwt {
   final class Auth0Impl(http: Http.Service) extends Service {
 
     override def getAccessToken(
-      authServerBaseUrl: URL,
-      clientId: String,
-      clientSecret: String,
-      audience: URL,
-      username: String,
-      password: String
+        authServerBaseUrl: URL,
+        clientId: String,
+        clientSecret: String,
+        audience: URL,
+        username: String,
+        password: String
     ): IO[CliError, String] = {
       val request: SttpRequest = basicRequest
         .body(JwtRequest(clientId, clientSecret, audience.value, "password", username, password))

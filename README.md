@@ -51,10 +51,10 @@ An example of how a manifest looks like:
   "data": {
     "schemas": [
       {
-        "vendor": "com.snplow.msc.gcp",
+        "vendor": "com.snplow.msc.ci",
         "name": "example_event",
         "format": "jsonschema",
-        "version": "1-0-7"
+        "version": "1-0-0"
       }
     ]
   }

@@ -7,9 +7,9 @@ import com.monovore.decline.effect.CommandIOApp
 import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
 import zio._
 import zio.interop.catz._
-
 import com.snowplowanalytics.datastructures.ci.BuildInfo._
 import com.snowplowanalytics.datastructures.ci.modules._
+import zio.console.putStrLn
 
 object Main extends App {
 
@@ -17,7 +17,8 @@ object Main extends App {
     CommandIOApp
       .run(name, description, version = version.some)(allSubcommands.map(_.leftWiden[Throwable]), args)
       .provideCustomLayer(wireCliEnv)
-      .exitCode
+      .map(res => ExitCode(res.code))
+      .catchAll(t => putStrLn(Console.RED + t.getMessage + Console.RESET).as(ExitCode.failure))
 
   def wireCliEnv: ULayer[DataStructuresApi with Jwt with Json] = {
     val http              = AsyncHttpClientZioBackend.layer().orDie >>> Http.sttpLayer

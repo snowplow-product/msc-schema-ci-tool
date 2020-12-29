@@ -23,37 +23,37 @@ object DataStructuresApi {
   trait Service {
 
     def validateSchema(
-      apiBaseUrl: URL,
-      token: String,
-      organizationId: UUID,
-      schema: CJson
+        apiBaseUrl: URL,
+        token: String,
+        organizationId: UUID,
+        schema: CJson
     ): IO[CliError, ValidationResponse]
 
     def checkSchemaDeployment(
-      apiBaseUrl: URL,
-      token: String,
-      organizationId: UUID,
-      environment: String,
-      schemaMetadata: Schema.Key
+        apiBaseUrl: URL,
+        token: String,
+        organizationId: UUID,
+        environment: String,
+        schemaMetadata: Schema.Key
     ): IO[CliError, Boolean]
 
   }
 
   // accessors
   def validateSchema(
-    apiBaseUrl: URL,
-    token: String,
-    organizationId: UUID,
-    schema: CJson
+      apiBaseUrl: URL,
+      token: String,
+      organizationId: UUID,
+      schema: CJson
   ): ZIO[DataStructuresApi, CliError, ValidationResponse] =
     ZIO.accessM(_.get[DataStructuresApi.Service].validateSchema(apiBaseUrl, token, organizationId, schema))
 
   def checkSchemaDeployment(
-    apiBaseUrl: URL,
-    token: String,
-    organizationId: UUID,
-    environment: String,
-    schemaMetadata: Schema.Key
+      apiBaseUrl: URL,
+      token: String,
+      organizationId: UUID,
+      environment: String,
+      schemaMetadata: Schema.Key
   ): ZIO[DataStructuresApi, CliError, Boolean] =
     ZIO.accessM(
       _.get[DataStructuresApi.Service]
@@ -64,10 +64,10 @@ object DataStructuresApi {
   final class LiveImpl(http: Http.Service) extends Service {
 
     override def validateSchema(
-      apiBaseUrl: URL,
-      token: String,
-      organizationId: UUID,
-      schema: CJson
+        apiBaseUrl: URL,
+        token: String,
+        organizationId: UUID,
+        schema: CJson
     ): IO[CliError, ValidationResponse] = {
       val buildRequest: Uri => SttpRequest =
         basicRequest
@@ -114,11 +114,11 @@ object DataStructuresApi {
     }
 
     override def checkSchemaDeployment(
-      apiBaseUrl: URL,
-      token: String,
-      organizationId: UUID,
-      environment: String,
-      schemaMetadata: Schema.Key
+        apiBaseUrl: URL,
+        token: String,
+        organizationId: UUID,
+        environment: String,
+        schemaMetadata: Schema.Key
     ): IO[CliError, Boolean] = {
       val basePath = s"$apiBaseUrl/api/schemas/v1"
       val filters  = s"env=$environment&version=${schemaMetadata.version}"

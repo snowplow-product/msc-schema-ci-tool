@@ -3,7 +3,7 @@ package com.snowplowanalytics.datastructures.ci.commands
 import scala.io.Source
 
 import cats.effect.ExitCode
-import eu.timepit.refined._
+import eu.timepit.refined.auto._
 import zio.ULayer
 import zio.test.Assertion._
 import zio.test._
@@ -26,44 +26,36 @@ object CheckDeploymentsSpec extends DefaultRunnableSpec {
         "should parse manifest, get a JWT token, invoke Schema API and " +
           "confirm that all schemas are deployed to the target env"
       ) {
-        val username: String       = "username"
-        val password: String       = "password"
-        val environment: String    = "DEV"
-        val apiBaseUrl: URL        = refineMV("https://example.com/api")
-        val authServerBaseUrl: URL = refineMV("https://auth.com")
-        val clientId: String       = "clientId"
-        val clientSecret: String   = "clientSecret"
-        val audience: URL          = refineMV("https://example.com/api")
+        val username: String     = "username"
+        val password: String     = "password"
+        val environment: String  = "DEV"
+        val apiUrl: URL          = "https://example.com/api"
+        val authServerUrl: URL   = "https://auth.com"
+        val clientId: String     = "clientId"
+        val clientSecret: String = "clientSecret"
+        val aud: URL             = "https://example.com/api"
 
         val command = CheckDeployments(
           "/",
           username,
           password,
           environment,
-          apiBaseUrl,
-          authServerBaseUrl,
+          apiUrl,
+          authServerUrl,
           clientId,
           clientSecret,
-          audience
+          aud
         )
 
         val schemas: List[Key] = List(Schema.Key("com.vendor", "name", "jsonschema", "1-0-0"))
         val token: String      = "token"
-        val orgId: UUID        = refineMV("18d4080d-b1c7-4d33-979d-3fd4be734cfb")
+        val orgId: UUID        = "18d4080d-b1c7-4d33-979d-3fd4be734cfb"
 
         val mockEnv: ULayer[Json with Jwt with DataStructuresApi] =
-          (ExtractSchemaDependenciesFromManifest(
-            isSubtype[Source](anything)
-          ) returns value(schemas)) andThen
-            (GetAccessToken(
-              equalTo((authServerBaseUrl, clientId, clientSecret, audience, username, password))
-            ) returns value(token)) andThen
-            (ExtractOrganizationIdFromToken(
-              equalTo((authServerBaseUrl, token))
-            ) returns value(orgId)) andThen
-            (CheckSchemaDeployment(
-              equalTo((apiBaseUrl, token, orgId, environment, schemas.head))
-            ) returns value(true))
+          ExtractSchemaDependenciesFromManifest(isSubtype[Source](anything), value(schemas)) ++
+            GetAccessToken(equalTo((authServerUrl, clientId, clientSecret, aud, username, password)), value(token)) ++
+            ExtractOrganizationIdFromToken(equalTo((authServerUrl, token)), value(orgId)) ++
+            CheckSchemaDeployment(equalTo((apiUrl, token, orgId, environment, schemas.head)), value(true))
 
         assertM(command.process.provideCustomLayer(mockEnv))(equalTo(ExitCode.Success))
       }

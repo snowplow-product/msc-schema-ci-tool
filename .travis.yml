@@ -3,7 +3,7 @@ language: scala
 if: (type = push AND (branch IN (master, develop) OR tag IS present)) OR type IN (pull_request, api, cron)
 
 scala:
-  - 2.12.11
+  - 2.13.3
 jdk:
   - openjdk8
 script:

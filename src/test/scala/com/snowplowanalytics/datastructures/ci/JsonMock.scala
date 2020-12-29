@@ -2,22 +2,18 @@ package com.snowplowanalytics.datastructures.ci
 
 import scala.io.Source
 
-import zio.test.mock.{Method, Proxy}
+import zio.test.mock._
 import zio.{Has, IO, URLayer, ZLayer}
 
 import com.snowplowanalytics.datastructures.ci.entities.Schema
 import com.snowplowanalytics.datastructures.ci.errors.CliError
 import com.snowplowanalytics.datastructures.ci.modules.Json
 
-object JsonMock {
+object JsonMock extends Mock[Json] {
 
-  sealed trait Tag[I, A] extends Method[Json, I, A] {
-    def envBuilder = JsonMock.envBuilder
-  }
+  object ExtractSchemaDependenciesFromManifest extends Effect[Source, CliError, List[Schema.Key]]
 
-  object ExtractSchemaDependenciesFromManifest extends Tag[Source, List[Schema.Key]]
-
-  private lazy val envBuilder: URLayer[Has[Proxy], Json] =
+  val compose: URLayer[Has[Proxy], Json] =
     ZLayer.fromService(invoke =>
       new Json.Service {
 

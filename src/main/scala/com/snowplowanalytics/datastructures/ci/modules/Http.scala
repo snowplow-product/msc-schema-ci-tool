@@ -2,10 +2,12 @@ package com.snowplowanalytics.datastructures.ci.modules
 
 import cats.syntax.either._
 import io.circe.{Json => CJson}
-import izumi.reflect.Tags.TagK
+import sttp.client.asynchttpclient.WebSocketHandler
+import sttp.client.asynchttpclient.zio.SttpClient
 import sttp.client.circe.asJsonAlways
 import sttp.client.{Request, SttpBackend}
 import zio._
+import zio.stream.Stream
 
 import com.snowplowanalytics.datastructures.ci.errors.CliError
 import com.snowplowanalytics.datastructures.ci.errors.CliError.Json.ParsingError
@@ -27,7 +29,7 @@ object Http {
     ZIO.accessM(_.get[Http.Service].sendRequest(request))
 
   // implementations
-  final class SttpImpl[WS[_]](sttpBackend: SttpBackend[Task, Nothing, WS]) extends Service {
+  final class SttpImpl[WS[_]](sttpBackend: SttpBackend[Task, Stream[Throwable, Byte], WebSocketHandler]) extends Service {
 
     override def sendRequest[A](request: SttpRequest, extractor: CJson => Either[ParsingError, A]): IO[CliError, A] =
       sendRequest(request)
@@ -46,5 +48,5 @@ object Http {
   }
 
   // layers
-  def sttpLayer[WS[_]: TagK]: URLayer[SttpClient[WS], Http] = ZLayer.fromService(new SttpImpl[WS](_))
+  def sttpLayer: URLayer[SttpClient, Http] = ZLayer.fromService(new SttpImpl(_))
 }

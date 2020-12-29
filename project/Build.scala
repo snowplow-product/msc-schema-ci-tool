@@ -9,20 +9,21 @@ import scalafix.sbt.ScalafixPlugin.autoImport.scalafixSemanticdb
 object Build {
 
   object Versions {
-    val zio        = "1.0.0-RC18-2"
-    val cats       = "2.0.0"
-    val catsEffect = "2.0.0"
-    val sttp       = "2.0.7"
+    val zio        = "1.0.3"
+    val cats       = "2.2.0"
+    val catsEffect = "2.2.0"
+    val sttp       = "2.2.9"
     val circe      = "0.13.0"
-    val decline    = "1.2.0"
-    val igluClient = "1.0.0-rc1"
+    val decline    = "1.3.0"
+    val igluClient = "1.0.2"
     val jwt        = "4.3.0"
     val jwk        = "1.0.5"
   }
 
   val dependencies: Seq[ModuleID] = Seq(
     "dev.zio"                      %% "zio"                           % Versions.zio,
-    "dev.zio"                      %% "zio-interop-cats"              % (Versions.catsEffect + ".0-RC12"),
+    "dev.zio"                      %% "zio-macros"                    % Versions.zio,
+    "dev.zio"                      %% "zio-interop-cats"              % (Versions.catsEffect + ".1"),
     "io.circe"                     %% "circe-core"                    % Versions.circe,
     "io.circe"                     %% "circe-generic"                 % Versions.circe,
     "io.circe"                     %% "circe-generic-extras"          % Versions.circe,
@@ -48,7 +49,7 @@ object Build {
   )
 
   val scalafixDependencies: Seq[ModuleID] = Seq(
-    "com.nequissimus" %% "sort-imports" % "0.5.0"
+    "com.github.liancheng" %% "organize-imports" % "0.4.4"
   )
 
   val welcomeMessage: String = {
@@ -57,7 +58,7 @@ object Build {
     def item(text: String): String = s"${GREEN}▶ ${CYAN}$text${RESET}"
 
     s"""Useful sbt tasks:
-       |${item("checkfmt")}      - Check source files formatting using scalafmt
+       |${item("fmtCheck")}      - Check source files formatting using scalafmt
        |${item("fmt")}           - Formats source files using scalafmt
        |${item("clean")}         - Clean target directory
        |${item("test")}          - Run tests
@@ -66,7 +67,7 @@ object Build {
   }
 
   lazy val sbtAssemblySettings: Seq[Setting[_]] = Seq(
-    assemblyJarName in assembly := { name.value },
+    assemblyJarName in assembly := name.value,
     mainClass in assembly := Some("com.snowplowanalytics.datastructures.ci.Main"),
     assemblyOption in assembly ~= { _.copy(prependShellScript = Some(defaultShellScript)) },
     crossPaths := false,

@@ -1,11 +1,5 @@
-addCommandAlias(
-  "fmt",
-  "scalafix RemoveUnused; test:scalafix RemoveUnused; all scalafix test:scalafix; all scalafmtSbt scalafmt test:scalafmt"
-)
-addCommandAlias(
-  "checkfmt",
-  "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck; all compile:scalafix --check; all test:scalafix --check;"
-)
+addCommandAlias("fmt", "all scalafmtSbt scalafmtAll; all scalafixAll")
+addCommandAlias("fmtCheck", "all scalafmtSbtCheck scalafmtCheckAll; all scalafixAll --check")
 
 lazy val root = (project in file("."))
   .settings(
@@ -13,10 +7,13 @@ lazy val root = (project in file("."))
     name := "data-structures-ci",
     description := "A CLI helper tool for common CI/CD scenarios when developing Snowplow Schemas",
     version := "0.3.0",
-    scalaVersion := "2.12.11",
-    scalacOptions += "-Yrangepos",
+    scalaVersion := "2.13.3",
+    scalacOptions += "-Ymacro-annotations",
     libraryDependencies ++= Build.dependencies,
-    scalafixDependencies in ThisBuild ++= Build.scalafixDependencies,
+    semanticdbEnabled in ThisBuild := true,
+    semanticdbVersion in ThisBuild := scalafixSemanticdb.revision,
+    scalafixDependencies in ThisBuild := Build.scalafixDependencies,
+    scalafixScalaBinaryVersion in ThisBuild := CrossVersion.binaryScalaVersion(scalaVersion.value),
     onLoadMessage := Build.welcomeMessage,
     onChangedBuildSource := ReloadOnSourceChanges,
     resolvers += Resolver.bintrayRepo("snowplow", "snowplow-maven"),

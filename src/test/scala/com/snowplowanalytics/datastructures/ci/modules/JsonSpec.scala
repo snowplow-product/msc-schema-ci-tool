@@ -7,7 +7,6 @@ import zio.test._
 import zio.test.environment.TestEnvironment
 
 import com.snowplowanalytics.datastructures.ci.entities.Schema
-import com.snowplowanalytics.datastructures.ci.entities.Schema
 import com.snowplowanalytics.datastructures.ci.errors.CliError
 import com.snowplowanalytics.datastructures.ci.modules.Json.{circeLayer, extractSchemaDependenciesFromManifest}
 

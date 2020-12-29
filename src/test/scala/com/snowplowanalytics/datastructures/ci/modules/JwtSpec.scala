@@ -3,6 +3,7 @@ package com.snowplowanalytics.datastructures.ci.modules
 import scala.io.Source
 
 import eu.timepit.refined._
+import eu.timepit.refined.auto._
 import eu.timepit.refined.string.Uuid
 import io.circe.literal._
 import io.circe.parser._
@@ -22,8 +23,8 @@ import com.snowplowanalytics.datastructures.ci.modules.Jwt._
 
 object JwtSpec extends DefaultRunnableSpec {
 
-  private val authServerUrl: URL   = refineMV("https://example.com")
-  private val audience: URL        = refineMV("https://example.com")
+  private val authServerUrl: URL   = "https://example.com"
+  private val audience: URL        = "https://example.com"
   private val clientId: String     = "cid"
   private val clientSecret: String = "cs"
   private val user: String         = "u"
@@ -59,14 +60,14 @@ object JwtSpec extends DefaultRunnableSpec {
   }
 
   object ExtractOrganizationIdFromTokenFixtures {
-    private[JwtSpec] val jwks  = Source.fromResource("auth/jwks.json").getLines.mkString
-    private[JwtSpec] val token = Source.fromResource("auth/token.txt").getLines.mkString
+    private[JwtSpec] val jwks  = Source.fromResource("auth/jwks.json").getLines().mkString
+    private[JwtSpec] val token = Source.fromResource("auth/token.txt").getLines().mkString
 
     private[JwtSpec] val matchRequest: Request[_, _] => Boolean =
       _.uri.toString == authServerUrl.value + "/.well-known/jwks.json"
 
     private[JwtSpec] val validAnswer: Response[CJson] =
-      Response.ok(parse(jwks).right.get)
+      Response.ok(parse(jwks).getOrElse(CJson.Null))
 
     private[JwtSpec] def serverStub(answer: Response[CJson] = validAnswer): ULayer[Http] =
       httpLayerFromSttpStub(sttpBackendStubForGet(matchRequest, answer))
@@ -78,7 +79,7 @@ object JwtSpec extends DefaultRunnableSpec {
       suite("getAccessToken")(
         testM("should fail if url is wrong") {
           assertM(
-            getAccessToken(refineMV("https://wrong.com"), clientId, clientSecret, audience, user, password).run
+            getAccessToken("https://wrong.com", clientId, clientSecret, audience, user, password).run
           )(
             fails(equalTo(CliError.Auth.InvalidCredentials))
           )
@@ -99,7 +100,7 @@ object JwtSpec extends DefaultRunnableSpec {
         },
         testM("should fail if audience is invalid") {
           assertM(
-            getAccessToken(authServerUrl, clientId, clientSecret, refineMV("https://wrong.com"), user, password).run
+            getAccessToken(authServerUrl, clientId, clientSecret, "https://wrong.com", user, password).run
           )(
             fails(equalTo(CliError.Auth.InvalidCredentials))
           )

@@ -18,15 +18,15 @@ import com.snowplowanalytics.datastructures.ci.modules.Json._
 import com.snowplowanalytics.datastructures.ci.modules.Jwt._
 
 case class CheckDeployments(
-  manifestPath: String,
-  username: String,
-  password: String,
-  environment: String,
-  apiBaseUrl: URL,
-  authServerBaseUrl: URL,
-  clientId: String,
-  clientSecret: String,
-  audience: URL
+    manifestPath: String,
+    username: String,
+    password: String,
+    environment: String,
+    apiBaseUrl: URL,
+    authServerBaseUrl: URL,
+    clientId: String,
+    clientSecret: String,
+    audience: URL
 ) extends CliSubcommand {
 
   override def process: CliTask[ExitCode] = {
@@ -59,11 +59,11 @@ case class CheckDeployments(
   }
 
   private def verifySchemaDeployment(
-    apiBaseUrl: URL,
-    token: String,
-    organizationId: UUID,
-    environment: String,
-    schemas: List[Schema.Key]
+      apiBaseUrl: URL,
+      token: String,
+      organizationId: UUID,
+      environment: String,
+      schemas: List[Schema.Key]
   ): ZIO[DataStructuresApi, CliError, Option[NonEmptyList[Schema.Key]]] =
     ZIO
       .foreachParN(5)(schemas) { schema =>

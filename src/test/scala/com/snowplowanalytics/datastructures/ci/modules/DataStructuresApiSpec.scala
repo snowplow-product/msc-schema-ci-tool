@@ -1,6 +1,6 @@
 package com.snowplowanalytics.datastructures.ci.modules
 
-import eu.timepit.refined.refineMV
+import eu.timepit.refined.auto._
 import io.circe.literal._
 import io.circe.{Json => CJson}
 import sttp.client.{Request, Response}
@@ -18,9 +18,9 @@ import com.snowplowanalytics.datastructures.ci.{URL, UUID}
 
 object DataStructuresApiSpec extends DefaultRunnableSpec {
 
-  private val apiBaseUrl: URL       = refineMV("https://example.com")
+  private val apiBaseUrl: URL       = "https://example.com"
   private val token: String         = "token"
-  private val organizationId: UUID  = refineMV("18d4080d-b1c7-4d33-979d-3fd4be734cfb")
+  private val organizationId: UUID  = "18d4080d-b1c7-4d33-979d-3fd4be734cfb"
   private val schemaKey: Schema.Key = Schema.Key("com.vendor", "name", "jsonschema", "1-0-0")
   private val hash: String          = "4d17d63e1acdb882757470f2be83a30e1dfc82c2e09519ed5fa5cc5e788bd3e2"
 

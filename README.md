@@ -61,18 +61,6 @@ An example of how a manifest looks like:
 }
 ```
 
-## Development
-
-If you are developing new commands or if you just want to test this tool against Next, just make sure to set these 
-environment variables before starting the tool:
-
-```bash
-export API_BASE_URL=https://next.console.snowplowanalytics.com
-export AUTH_SERVER_BASE_URL=https://snowplow-next.eu.auth0.com
-export AUTH_CLIENT_ID='<Next client id>'
-export AUTH_CLIENT_SECRET='<Next client secret>'
-```
-
 [gh-actions-image]: https://github.com/snowplow-product/msc-schema-ci-tool/workflows/ci/badge.svg?branch=master
 [gh-actions]: https://github.com/snowplow-product/msc-schema-ci-tool/actions?query=workflow%3Aci
 

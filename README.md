@@ -1,6 +1,6 @@
 # Data Structures CI
-[![Build Status][travis-image]][travis]
-[![Binary Download][bintray-image]][bintray]
+[![Build Status][gh-actions-image]][gh-actions]
+[![Download][gh-release-image]][gh-release]
 [![License][license-image]][license]
 
 Data Structures CI is a command-line tool which allows you to integrate Data Structures API (formerly Schema API) 
@@ -15,10 +15,10 @@ Currently, it supports one common task:
 
 ## User Quickstart
 
-You can download schema-ci from our Bintray repository, using the following command:
+You can download data-structures-ci using the following command:
 
 ```
-curl -L "https://dl.bintray.com/snowplow/snowplow-generic/data_structures_ci_0.3.2.zip" | jar xv
+curl -L "https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/0.3.3/data_structures_ci_0.3.3.zip" | jar xv 
 ```
 
 In order to be able to perform any task, you need to supply credentials of a user which you will use for CI purposes.
@@ -73,11 +73,11 @@ export AUTH_CLIENT_ID='<Next client id>'
 export AUTH_CLIENT_SECRET='<Next client secret>'
 ```
 
-[travis-image]: https://travis-ci.com/snowplow-product/msc-schema-ci-tool.svg?token=F4Ce9m1YA8HqgpFQMcL5&branch=master
-[travis]: https://travis-ci.com/snowplow-product/msc-schema-ci-tool
+[gh-actions-image]: https://github.com/snowplow-product/msc-schema-ci-tool/workflows/ci/badge.svg?branch=master
+[gh-actions]: https://github.com/snowplow-product/msc-schema-ci-tool/actions?query=workflow%3Aci
 
-[bintray-image]: https://api.bintray.com/packages/snowplow/snowplow-generic/data-structures-ci/images/download.svg
-[bintray]: https://bintray.com/snowplow/snowplow-generic/data-structures-ci/_latestVersion
+[gh-release-image]: https://img.shields.io/github/downloads/snowplow-product/msc-schema-ci-tool/total
+[gh-release]: https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/0.3.3/data_structures_ci_0.3.3.zip
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
 [license]: http://www.apache.org/licenses/LICENSE-2.0

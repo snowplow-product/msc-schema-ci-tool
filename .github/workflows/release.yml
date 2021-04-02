@@ -1,0 +1,39 @@
+name: release
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v2
+      - name: Install Java and sbt
+        uses: olafurpg/setup-scala@v10
+        with:
+          java-version: adopt@1.8
+      - name: Restore sbt cache
+        uses: coursier/cache-action@v6
+      - name: Assembly
+        run: sbt assembly
+      - name: Extract version from tag
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          ASSET_NAME=data_structures_ci_${VERSION}.zip
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "ASSET_NAME=$ASSET_NAME" >> $GITHUB_ENV
+      - name: Zip artifact
+        uses: montudor/action-zip@v0.1.1
+        with:
+          args: zip -qq -j '${{ env.ASSET_NAME }}' target/data-structures-ci
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: v${{ env.VERSION }}
+          files: ${{ env.ASSET_NAME }}
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

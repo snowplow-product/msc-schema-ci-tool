@@ -55,11 +55,13 @@ object JwtSpec extends DefaultRunnableSpec {
   }
 
   object ExtractOrganizationIdFromTokenFixtures {
+
     private[JwtSpec] val matchRequest: Request[_, _] => Boolean =
       _.uri.toString == authServerUrl.value + "/.well-known/jwks.json"
 
     private[JwtSpec] def serverStub(answer: Response[CJson]): ULayer[Http] =
       httpLayerFromSttpStub(sttpBackendStubForGet(matchRequest, answer))
+
   }
 
   override def spec: ZSpec[TestEnvironment, Any] =

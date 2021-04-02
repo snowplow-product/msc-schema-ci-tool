@@ -6,10 +6,11 @@ import com.monovore.decline.Opts
 import com.monovore.decline.effect.CommandIOApp
 import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
 import zio._
+import zio.console.putStrLn
 import zio.interop.catz._
+
 import com.snowplowanalytics.datastructures.ci.BuildInfo._
 import com.snowplowanalytics.datastructures.ci.modules._
-import zio.console.putStrLn
 
 object Main extends App {
 

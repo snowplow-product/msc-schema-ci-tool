@@ -1,12 +1,7 @@
 package com.snowplowanalytics.datastructures.ci.modules
 
-import scala.io.Source
-
-import eu.timepit.refined._
 import eu.timepit.refined.auto._
-import eu.timepit.refined.string.Uuid
 import io.circe.literal._
-import io.circe.parser._
 import io.circe.{Json => CJson}
 import sttp.client.{Request, Response}
 import sttp.model.StatusCode._
@@ -60,18 +55,11 @@ object JwtSpec extends DefaultRunnableSpec {
   }
 
   object ExtractOrganizationIdFromTokenFixtures {
-    private[JwtSpec] val jwks  = Source.fromResource("auth/jwks.json").getLines().mkString
-    private[JwtSpec] val token = Source.fromResource("auth/token.txt").getLines().mkString
-
     private[JwtSpec] val matchRequest: Request[_, _] => Boolean =
       _.uri.toString == authServerUrl.value + "/.well-known/jwks.json"
 
-    private[JwtSpec] val validAnswer: Response[CJson] =
-      Response.ok(parse(jwks).getOrElse(CJson.Null))
-
-    private[JwtSpec] def serverStub(answer: Response[CJson] = validAnswer): ULayer[Http] =
+    private[JwtSpec] def serverStub(answer: Response[CJson]): ULayer[Http] =
       httpLayerFromSttpStub(sttpBackendStubForGet(matchRequest, answer))
-
   }
 
   override def spec: ZSpec[TestEnvironment, Any] =
@@ -120,15 +108,6 @@ object JwtSpec extends DefaultRunnableSpec {
             extractOrganizationIdFromToken(authServerUrl, "token").run.provideCustomLayer(env)
           )(
             fails(isSubtype[CliError.Auth](anything))
-          )
-        },
-        testM("should extract organizationId from a valid token") {
-          val token = ExtractOrganizationIdFromTokenFixtures.token
-          val env   = ExtractOrganizationIdFromTokenFixtures.serverStub() >>> Jwt.auth0Layer
-          assertM(
-            extractOrganizationIdFromToken(authServerUrl, token).provideCustomLayer(env)
-          )(
-            equalTo(refineMV[Uuid]("75ea1aeb-4379-4958-8cbb-1a5cefbb4d29"))
           )
         }
       )

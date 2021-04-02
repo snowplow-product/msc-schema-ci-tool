@@ -20,20 +20,16 @@ jobs:
       - name: Assembly
         run: sbt assembly
       - name: Extract version from tag
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          ASSET_NAME=data_structures_ci_${VERSION}.zip
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "ASSET_NAME=$ASSET_NAME" >> $GITHUB_ENV
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - name: Zip artifact
         uses: montudor/action-zip@v0.1.1
         with:
-          args: zip -qq -j '${{ env.ASSET_NAME }}' target/data-structures-ci
+          args: zip -j 'data_structures_ci_${{ env.VERSION }}.zip' target/data-structures-ci
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@master
         with:
           name: v${{ env.VERSION }}
-          files: ${{ env.ASSET_NAME }}
+          files: '*.zip'
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

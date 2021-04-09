@@ -18,7 +18,7 @@ Currently, it supports one common task:
 You can download data-structures-ci using the following command:
 
 ```
-curl -L "https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/0.3.3/data_structures_ci_0.3.3.zip" | jar xv 
+curl -L "https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/0.3.3/data_structures_ci_0.3.4.zip" | jar xv 
 ```
 
 In order to be able to perform any task, you need to supply credentials of a user which you will use for CI purposes.
@@ -65,7 +65,7 @@ An example of how a manifest looks like:
 [gh-actions]: https://github.com/snowplow-product/msc-schema-ci-tool/actions?query=workflow%3Aci
 
 [gh-release-image]: https://img.shields.io/github/downloads/snowplow-product/msc-schema-ci-tool/total
-[gh-release]: https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/0.3.3/data_structures_ci_0.3.3.zip
+[gh-release]: https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/0.3.4/data_structures_ci_0.3.4.zip
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
 [license]: http://www.apache.org/licenses/LICENSE-2.0

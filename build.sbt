@@ -15,7 +15,6 @@ lazy val root = (project in file("."))
     scalafixDependencies in ThisBuild := Build.scalafixDependencies,
     scalafixScalaBinaryVersion in ThisBuild := CrossVersion.binaryScalaVersion(scalaVersion.value),
     onLoadMessage := Build.welcomeMessage,
-    onChangedBuildSource := ReloadOnSourceChanges,
     resolvers += Resolver.bintrayRepo("snowplow", "snowplow-maven"),
     testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
   )

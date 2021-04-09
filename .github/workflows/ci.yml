@@ -17,3 +17,6 @@ jobs:
         uses: coursier/cache-action@v6
       - name: Compile and run tests
         run: sbt test
+        env:
+          SNOWPLOW_API_CLIENT_ID: ${{ secrets.SNOWPLOW_API_CLIENT_ID }}
+          SNOWPLOW_API_CLIENT_SECRET: ${{ secrets.SNOWPLOW_API_CLIENT_SECRET }}

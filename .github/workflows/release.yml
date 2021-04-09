@@ -19,6 +19,9 @@ jobs:
         uses: coursier/cache-action@v6
       - name: Assembly
         run: sbt assembly
+        env:
+          SNOWPLOW_API_CLIENT_ID: ${{ secrets.SNOWPLOW_API_CLIENT_ID }}
+          SNOWPLOW_API_CLIENT_SECRET: ${{ secrets.SNOWPLOW_API_CLIENT_SECRET }}
       - name: Extract version from tag
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - name: Zip artifact

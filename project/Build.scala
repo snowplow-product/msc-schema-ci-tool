@@ -83,8 +83,8 @@ object Build {
       name,
       version,
       description,
-      "cid" -> sys.env.getOrElse("SNOWPLOW_API_CLIENT_ID", ""),
-      "cs"  -> sys.env.getOrElse("SNOWPLOW_API_CLIENT_SECRET", "")
+      "cid" -> sys.env("SNOWPLOW_API_CLIENT_ID"),
+      "cs"  -> sys.env("SNOWPLOW_API_CLIENT_SECRET")
     ),
     buildInfoPackage := "com.snowplowanalytics.datastructures.ci"
   )

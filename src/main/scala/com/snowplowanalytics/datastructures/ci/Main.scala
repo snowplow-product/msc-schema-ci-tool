@@ -4,7 +4,7 @@ import cats.effect.{ExitCode => CEExitCode}
 import cats.implicits._
 import com.monovore.decline.Opts
 import com.monovore.decline.effect.CommandIOApp
-import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
+import sttp.client3.asynchttpclient.zio.AsyncHttpClientZioBackend
 import zio._
 import zio.console.putStrLn
 import zio.interop.catz._
@@ -19,7 +19,7 @@ object Main extends App {
       .run(name, description, version = version.some)(allSubcommands.map(_.leftWiden[Throwable]), args)
       .provideCustomLayer(wireCliEnv)
       .map(res => ExitCode(res.code))
-      .catchAll(t => putStrLn(Console.RED + t.getMessage + Console.RESET).as(ExitCode.failure))
+      .catchAll(t => putStrLn(Console.RED + t.getMessage + Console.RESET).orDie.as(ExitCode.failure))
 
   def wireCliEnv: ULayer[DataStructuresApi with Jwt with Json] = {
     val http              = AsyncHttpClientZioBackend.layer().orDie >>> Http.sttpLayer

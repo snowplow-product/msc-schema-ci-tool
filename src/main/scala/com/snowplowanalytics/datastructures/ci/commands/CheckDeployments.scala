@@ -1,13 +1,11 @@
 package com.snowplowanalytics.datastructures.ci.commands
 
 import scala.io.Source
-
 import cats.data.NonEmptyList
 import cats.effect.ExitCode
 import cats.implicits._
 import zio._
 import zio.console._
-
 import com.snowplowanalytics.datastructures.ci._
 import com.snowplowanalytics.datastructures.ci.entities.Schema
 import com.snowplowanalytics.datastructures.ci.entities.Schema.Key._
@@ -30,23 +28,24 @@ case class CheckDeployments(
 ) extends CliSubcommand {
 
   override def process: CliTask[ExitCode] = {
-    val printInfo: List[Schema.Key] => URIO[Console, Unit] = schemas =>
-      for {
+    val printInfo: List[Schema.Key] => ZIO[Console, CliError, Unit] = schemas =>
+      (for {
         _ <- putStrLn(s"Ensuring that the following schemas are already deployed on '$environment':")
         _ <- putStrLn(s"${schemas.show}")
-      } yield ()
+      } yield ()).mapError(CliError.GenericError("printInfo failed", _))
 
-    val printSuccess: URIO[Console, Unit] =
+    val printSuccess: ZIO[Console, CliError, Unit] =
       putStrLn("All schemas are already deployed! You are good to go.")
+        .mapError(CliError.GenericError("printSuccess failed", _))
 
-    val printError: NonEmptyList[Schema.Key] => URIO[Console, Unit] = e =>
-      for {
+    val printError: NonEmptyList[Schema.Key] => ZIO[Console, CliError, Unit] = e =>
+      (for {
         _ <- putStrLn(scala.Console.RED)
         _ <- putStrLn("Deployment check failed!")
         _ <- putStrLn(s"The following schemas are not deployed on '$environment' yet:")
         _ <- putStrLn(s"${e.toList.show}")
         _ <- putStrLn(scala.Console.RESET)
-      } yield ()
+      } yield ()).mapError(CliError.GenericError("printError failed", _))
 
     for {
       schemas  <- extractSchemaDependenciesFromManifest(Source.fromFile(manifestPath))

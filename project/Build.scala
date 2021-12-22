@@ -9,47 +9,53 @@ import scalafix.sbt.ScalafixPlugin.autoImport.scalafixSemanticdb
 object Build {
 
   object Versions {
-    val zio        = "1.0.3"
-    val cats       = "2.2.0"
-    val catsEffect = "2.2.0"
-    val sttp       = "2.2.9"
-    val circe      = "0.13.0"
-    val decline    = "1.3.0"
-    val igluClient = "1.0.2"
-    val jwt        = "4.3.0"
-    val jwk        = "1.0.5"
+    val zio        = "1.0.13"
+    val cats       = "2.7.0"
+    val catsEffect = "2.5.1"
+    val sttp       = "3.3.18"
+    val netty      = "4.1.72.Final"
+    val circe      = "0.14.1"
+    val decline    = "1.4.0"
+    val igluClient = "1.1.1"
+    val jwt        = "9.0.2"
+    val jwk        = "1.2.22"
   }
 
   val dependencies: Seq[ModuleID] = Seq(
-    "dev.zio"                      %% "zio"                           % Versions.zio,
-    "dev.zio"                      %% "zio-macros"                    % Versions.zio,
-    "dev.zio"                      %% "zio-interop-cats"              % (Versions.catsEffect + ".1"),
-    "io.circe"                     %% "circe-core"                    % Versions.circe,
-    "io.circe"                     %% "circe-generic"                 % Versions.circe,
-    "io.circe"                     %% "circe-generic-extras"          % Versions.circe,
-    "io.circe"                     %% "circe-parser"                  % Versions.circe,
-    "io.circe"                     %% "circe-literal"                 % Versions.circe,
-    "org.typelevel"                %% "cats-core"                     % Versions.cats,
-    "org.typelevel"                %% "cats-effect"                   % Versions.catsEffect,
-    "com.softwaremill.sttp.client" %% "core"                          % Versions.sttp,
-    "com.softwaremill.sttp.client" %% "circe"                         % Versions.sttp,
-    "com.softwaremill.sttp.client" %% "async-http-client-backend-zio" % Versions.sttp,
-    "com.monovore"                 %% "decline"                       % Versions.decline,
-    "com.monovore"                 %% "decline-effect"                % Versions.decline,
-    "com.monovore"                 %% "decline-refined"               % Versions.decline,
-    "com.snowplowanalytics"        %% "iglu-scala-client"             % Versions.igluClient,
-    "com.pauldijou"                %% "jwt-circe"                     % Versions.jwt,
-    "com.chatwork"                 %% "scala-jwk"                     % Versions.jwk,
-    "dev.zio"                      %% "zio-test"                      % Versions.zio % "test",
-    "dev.zio"                      %% "zio-test-sbt"                  % Versions.zio % "test",
-    "org.slf4j"                     % "slf4j-nop"                     % "1.7.30",
-    compilerPlugin("org.typelevel" %% "kind-projector"     % "0.11.0" cross CrossVersion.full),
+    "dev.zio"                       %% "zio"                           % Versions.zio,
+    "dev.zio"                       %% "zio-macros"                    % Versions.zio,
+    "dev.zio"                       %% "zio-interop-cats"              % (Versions.catsEffect + ".0"),
+    "io.circe"                      %% "circe-core"                    % Versions.circe,
+    "io.circe"                      %% "circe-generic"                 % Versions.circe,
+    "io.circe"                      %% "circe-generic-extras"          % Versions.circe,
+    "io.circe"                      %% "circe-parser"                  % Versions.circe,
+    "io.circe"                      %% "circe-literal"                 % Versions.circe,
+    "org.typelevel"                 %% "cats-core"                     % Versions.cats,
+    "org.typelevel"                 %% "cats-effect"                   % Versions.catsEffect,
+    "com.softwaremill.sttp.client3" %% "core"                          % Versions.sttp,
+    "com.softwaremill.sttp.client3" %% "circe"                         % Versions.sttp,
+    "com.softwaremill.sttp.client3" %% "async-http-client-backend-zio" % Versions.sttp,
+    // Override netty with latest available to get https://github.com/netty/netty/pull/11805 fix
+    "io.netty"                       % "netty-codec-http"              % Versions.netty,
+    "io.netty"                       % "netty-codec-socks"             % Versions.netty,
+    "io.netty"                       % "netty-handler"                 % Versions.netty,
+    "io.netty"                       % "netty-handler-proxy"           % Versions.netty,
+    "com.monovore"                  %% "decline"                       % Versions.decline,
+    "com.monovore"                  %% "decline-effect"                % Versions.decline,
+    "com.monovore"                  %% "decline-refined"               % Versions.decline,
+    "com.snowplowanalytics"         %% "iglu-scala-client"             % Versions.igluClient,
+    "com.github.jwt-scala"          %% "jwt-circe"                     % Versions.jwt,
+    "com.chatwork"                  %% "scala-jwk"                     % Versions.jwk,
+    "dev.zio"                       %% "zio-test"                      % Versions.zio % "test",
+    "dev.zio"                       %% "zio-test-sbt"                  % Versions.zio % "test",
+    "org.slf4j"                      % "slf4j-nop"                     % "1.7.30",
+    compilerPlugin("org.typelevel" %% "kind-projector"     % "0.13.2" cross CrossVersion.full),
     compilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1"),
     compilerPlugin(scalafixSemanticdb)
   )
 
   val scalafixDependencies: Seq[ModuleID] = Seq(
-    "com.github.liancheng" %% "organize-imports" % "0.4.4"
+    "com.github.liancheng" %% "organize-imports" % "0.6.0"
   )
 
   val welcomeMessage: String = {
@@ -67,12 +73,12 @@ object Build {
   }
 
   lazy val sbtAssemblySettings: Seq[Setting[_]] = Seq(
-    assemblyJarName in assembly := name.value,
-    mainClass in assembly := Some("com.snowplowanalytics.datastructures.ci.Main"),
-    assemblyOption in assembly ~= { _.copy(prependShellScript = Some(defaultShellScript)) },
+    assembly / assemblyJarName := name.value,
+    assembly / mainClass := Some("com.snowplowanalytics.datastructures.ci.Main"),
+    assembly / assemblyOption ~= { _.copy(prependShellScript = Some(defaultShellScript)) },
     crossPaths := false,
-    test in assembly := {},
-    assemblyMergeStrategy in assembly := {
+    assembly / test := {},
+    assembly / assemblyMergeStrategy := {
       case PathList("META-INF", _*) => MergeStrategy.discard
       case _                        => MergeStrategy.first
     }

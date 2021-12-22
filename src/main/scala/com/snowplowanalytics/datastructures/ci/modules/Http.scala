@@ -2,18 +2,17 @@ package com.snowplowanalytics.datastructures.ci.modules
 
 import cats.syntax.either._
 import io.circe.{Json => CJson}
-import sttp.client.asynchttpclient.WebSocketHandler
-import sttp.client.asynchttpclient.zio.SttpClient
-import sttp.client.circe.asJsonAlways
-import sttp.client.{Request, SttpBackend}
+import sttp.client3.asynchttpclient.zio.SttpClient
+import sttp.client3.circe.asJsonAlways
+import sttp.client3.{Request, SttpBackend}
 import zio._
-import zio.stream.Stream
-
 import com.snowplowanalytics.datastructures.ci.errors.CliError
 import com.snowplowanalytics.datastructures.ci.errors.CliError.Json.ParsingError
+import sttp.capabilities.zio.ZioStreams
+import sttp.capabilities.WebSockets
 
 object Http {
-  type SttpRequest = Request[Either[String, String], Nothing]
+  type SttpRequest = Request[Either[String, String], Any]
 
   trait Service {
     def sendRequest[A](request: SttpRequest, extractor: CJson => Either[ParsingError, A]): IO[CliError, A]
@@ -29,7 +28,7 @@ object Http {
     ZIO.accessM(_.get[Http.Service].sendRequest(request))
 
   // implementations
-  final class SttpImpl[WS[_]](sttpBackend: SttpBackend[Task, Stream[Throwable, Byte], WebSocketHandler]) extends Service {
+  final class SttpImpl(sttpBackend: SttpBackend[Task, ZioStreams with WebSockets]) extends Service {
 
     override def sendRequest[A](request: SttpRequest, extractor: CJson => Either[ParsingError, A]): IO[CliError, A] =
       sendRequest(request)
@@ -39,7 +38,7 @@ object Http {
     override def sendRequest(request: SttpRequest): IO[CliError, CJson] =
       sttpBackend
         .send(request.response(asJsonAlways[CJson]))
-        .bimap(
+        .mapBoth(
           CliError.GenericError("Network error", _),
           _.body.leftMap(de => CliError.Json.ParsingError("Cannot decode response payload as JSON", de.error))
         )

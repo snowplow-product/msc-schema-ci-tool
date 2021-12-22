@@ -6,8 +6,8 @@ import cats.data.NonEmptyList
 import cats.implicits._
 import io.circe.generic.auto._
 import io.circe.{Json => CJson, _}
-import sttp.client._
-import sttp.client.circe._
+import sttp.client3._
+import sttp.client3.circe._
 import sttp.model.Uri
 import zio.{IO, URLayer, ZIO, ZLayer}
 
@@ -123,13 +123,13 @@ object DataStructuresApi {
       val basePath = s"$apiBaseUrl/api/schemas/v1"
       val filters  = s"env=$environment&version=${schemaMetadata.version}"
 
-      val extractDeployments: CJson => Either[ParsingError, List[CJson]] =
-        _.hcursor.as[List[CJson]].leftMap(ParsingError("Unexpected response format", _))
+      val extractDeployments: CJson => List[CJson] =
+        _.hcursor.as[List[CJson]].getOrElse(List.empty)
 
       for {
         schemaHash  <- computeSchemaHash(organizationId, schemaMetadata)
         uri         <- parseUri(s"$basePath/organizations/$organizationId/schemas/$schemaHash/deployments?$filters")
-        deployments <- http.sendRequest(basicRequest.auth.bearer(token).get(uri), extractDeployments)
+        deployments <- http.sendRequest(basicRequest.auth.bearer(token).get(uri)).map(extractDeployments)
       } yield deployments.nonEmpty
     }
 

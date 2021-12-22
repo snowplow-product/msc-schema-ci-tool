@@ -2,30 +2,29 @@ package com.snowplowanalytics.datastructures.ci
 
 import io.circe.parser.parse
 import io.circe.{Decoder, Encoder, Printer}
-import sttp.client.asynchttpclient.WebSocketHandler
-import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
-import sttp.client.testing.SttpBackendStub
-import sttp.client.{NothingT, Request, Response, StringBody}
+import sttp.client3.asynchttpclient.zio.AsyncHttpClientZioBackend
+import sttp.client3.testing.SttpBackendStub
+import sttp.client3.{Request, Response, StringBody}
 import sttp.model.StatusCode.{BadRequest, NotFound}
 import sttp.model.{MediaType, Method}
-import zio.stream.Stream
 import zio.{Task, ULayer, ZLayer}
-
 import com.snowplowanalytics.datastructures.ci.modules.Http
 import com.snowplowanalytics.datastructures.ci.modules.Http.SttpImpl
+import sttp.capabilities.zio.ZioStreams
+import sttp.capabilities.WebSockets
 
 object TestFixtures {
 
   def sttpBackendStubForPost[A: Decoder, B: Encoder](
       requestMatcher: Request[_, _] => Boolean,
       answer: A => Response[B]
-  ): SttpBackendStub[Task, Stream[Throwable, Byte], WebSocketHandler] =
+  ): SttpBackendStub[Task, ZioStreams with WebSockets] =
     AsyncHttpClientZioBackend
       .stub
       .whenRequestMatchesPartial {
         case r if r.method == Method.POST && requestMatcher(r) =>
           r.body match {
-            case StringBody(body, "utf-8", Some(MediaType.ApplicationJson)) =>
+            case StringBody(body, "utf-8", MediaType.ApplicationJson) =>
               parse(body)
                 .flatMap(_.hcursor.as[A])
                 .map(answer.andThen(res => res.copy(body = Encoder[B].apply(res.body).printWith(Printer.noSpaces))))
@@ -38,7 +37,7 @@ object TestFixtures {
   def sttpBackendStubForGet[B: Encoder](
       requestMatcher: Request[_, _] => Boolean,
       answer: Response[B]
-  ): SttpBackendStub[Task, Stream[Throwable, Byte], WebSocketHandler] =
+  ): SttpBackendStub[Task, ZioStreams with WebSockets] =
     AsyncHttpClientZioBackend
       .stub
       .whenRequestMatchesPartial {
@@ -48,9 +47,7 @@ object TestFixtures {
           Response("{}", NotFound)
       }
 
-  def httpLayerFromSttpStub(
-      sttpBackendStub: SttpBackendStub[Task, Stream[Throwable, Byte], WebSocketHandler]
-  ): ULayer[Http] =
-    ZLayer.succeed(new SttpImpl[NothingT](sttpBackendStub))
+  def httpLayerFromSttpStub(sttpBackendStub: SttpBackendStub[Task, ZioStreams with WebSockets]): ULayer[Http] =
+    ZLayer.succeed(new SttpImpl(sttpBackendStub))
 
 }

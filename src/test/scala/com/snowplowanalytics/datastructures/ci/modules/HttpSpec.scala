@@ -3,39 +3,35 @@ package com.snowplowanalytics.datastructures.ci.modules
 import cats.syntax.either._
 import io.circe.literal._
 import io.circe.{Json => CJson}
-import sttp.client._
-import sttp.client.asynchttpclient.WebSocketHandler
-import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
-import sttp.client.testing.SttpBackendStub
-import zio.Task
-import zio.stream._
+import sttp.client3._
+import sttp.client3.asynchttpclient.zio.AsyncHttpClientZioBackend
+import sttp.client3.testing.SttpBackendStub
+import zio.{Task, ZIO}
 import zio.test.Assertion._
 import zio.test._
 import zio.test.environment.TestEnvironment
-
 import com.snowplowanalytics.datastructures.ci.TestFixtures._
 import com.snowplowanalytics.datastructures.ci.errors.CliError
 import com.snowplowanalytics.datastructures.ci.errors.CliError.Json.ParsingError
 import com.snowplowanalytics.datastructures.ci.modules.Http.sendRequest
+import sttp.capabilities.zio.ZioStreams
+import sttp.capabilities.WebSockets
 
 object HttpSpec extends DefaultRunnableSpec {
 
-  private def suspendThrow(e: => Throwable): Response[Any] =
-    throw e
-
-  private val throwingBackend: SttpBackendStub[Task, Stream[Throwable, Byte], WebSocketHandler] =
+  private val throwingBackend: SttpBackendStub[Task, ZioStreams with WebSockets] =
     AsyncHttpClientZioBackend
       .stub
       .whenAnyRequest
-      .thenRespond(suspendThrow(new SttpClientException.ConnectException(new RuntimeException)))
+      .thenRespondF(req => ZIO.fail(new SttpClientException.ConnectException(req, new RuntimeException)))
 
-  private val nonJsonBackend: SttpBackendStub[Task, Stream[Throwable, Byte], WebSocketHandler] =
+  private val nonJsonBackend: SttpBackendStub[Task, ZioStreams with WebSockets] =
     AsyncHttpClientZioBackend
       .stub
       .whenAnyRequest
       .thenRespond("plaintext")
 
-  private val jsonBackend: SttpBackendStub[Task, Stream[Throwable, Byte], WebSocketHandler] =
+  private val jsonBackend: SttpBackendStub[Task, ZioStreams with WebSockets] =
     sttpBackendStubForGet(_ => true, Response.ok(json"""{ "key": "value" }"""))
 
   override def spec: ZSpec[TestEnvironment, Any] =

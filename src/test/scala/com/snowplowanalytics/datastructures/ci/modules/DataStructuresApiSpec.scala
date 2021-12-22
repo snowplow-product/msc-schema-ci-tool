@@ -3,7 +3,7 @@ package com.snowplowanalytics.datastructures.ci.modules
 import eu.timepit.refined.auto._
 import io.circe.literal._
 import io.circe.{Json => CJson}
-import sttp.client.{Request, Response}
+import sttp.client3.{Request, Response}
 import sttp.model.Header
 import sttp.model.Uri.QuerySegment
 import zio.ULayer

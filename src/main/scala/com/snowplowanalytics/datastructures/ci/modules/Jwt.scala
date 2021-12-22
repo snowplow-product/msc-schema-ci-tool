@@ -10,8 +10,8 @@ import eu.timepit.refined.string.Uuid
 import io.circe.parser._
 import io.circe.{Json => CJson}
 import pdi.jwt.{JwtCirce, JwtHeader, JwtOptions}
-import sttp.client._
-import sttp.client.circe._
+import sttp.client3._
+import sttp.client3.circe._
 import zio._
 
 import com.snowplowanalytics.datastructures.ci.entities.JwtRequest

@@ -23,7 +23,7 @@ curl -L "https://github.com/snowplow-product/msc-schema-ci-tool/releases/downloa
 
 In order to be able to perform any task, you need to supply credentials of a user which you will use for CI purposes.
 These credentials come in form of a username and a password which can be obtained by creating an __admin__
-user for your organization from the dedicated Snowplow Insights Console page.
+user for your organization from the dedicated Snowplow BDP Console page.
 
 ## Usage
 

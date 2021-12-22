@@ -18,7 +18,7 @@ Currently, it supports one common task:
 You can download data-structures-ci using the following command:
 
 ```
-curl -L "https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/0.3.5/data_structures_ci_0.3.5.zip" | jar xv 
+curl -L "https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/0.3.5/data_structures_ci_0.3.5.zip" | jar xv && chmod +x ./data-structures-ci
 ```
 
 In order to be able to perform any task, you need to supply credentials of a user which you will use for CI purposes.

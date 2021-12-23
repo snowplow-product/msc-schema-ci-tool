@@ -21,7 +21,7 @@ You can download data-structures-ci using the following command:
 curl -L "https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/1.0.0/data_structures_ci_1.0.0.zip" | jar xv 
 ```
 
-In order to be able to perform any task, you will need to be a customer and supply both your Organization and 
+In order to be able to perform any task, you will need to be a customer and supply both your Organization ID and 
 an API key, which you can generate from https://console.snowplowanalytics.com/<organization-id>/credentials.
 Those two should be provided as env vars.
 

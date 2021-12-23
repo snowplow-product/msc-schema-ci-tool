@@ -23,38 +23,28 @@ object CheckDeploymentsSpec extends DefaultRunnableSpec {
   override def spec: ZSpec[TestEnvironment, Any] =
     suite("CheckDeployments spec")(
       testM(
-        "should parse manifest, get a JWT token, invoke Schema API and " +
+        "should parse manifest, get a JWT token, invoke Data Structures API and " +
           "confirm that all schemas are deployed to the target env"
       ) {
-        val username: String     = "username"
-        val password: String     = "password"
-        val environment: String  = "DEV"
-        val apiUrl: URL          = "https://example.com/api"
-        val authServerUrl: URL   = "https://auth.com"
-        val clientId: String     = "clientId"
-        val clientSecret: String = "clientSecret"
-        val aud: URL             = "https://example.com/api"
+        val environment: String = "DEV"
+        val apiUrl: URL         = "https://example.com/api"
+        val orgId: UUID         = "3e31e38c-001c-4edf-99bb-d2a9c2925bcb"
+        val apiKey: String      = "key"
 
         val command = CheckDeployments(
           "/",
-          username,
-          password,
           environment,
           apiUrl,
-          authServerUrl,
-          clientId,
-          clientSecret,
-          aud
+          orgId,
+          apiKey
         )
 
         val schemas: List[Key] = List(Schema.Key("com.vendor", "name", "jsonschema", "1-0-0"))
         val token: String      = "token"
-        val orgId: UUID        = "18d4080d-b1c7-4d33-979d-3fd4be734cfb"
 
         val mockEnv: ULayer[Json with Jwt with DataStructuresApi] =
           ExtractSchemaDependenciesFromManifest(isSubtype[Source](anything), value(schemas)) ++
-            GetAccessToken(equalTo((authServerUrl, clientId, clientSecret, aud, username, password)), value(token)) ++
-            ExtractOrganizationIdFromToken(equalTo((authServerUrl, token)), value(orgId)) ++
+            GetAccessToken(equalTo((apiUrl, orgId, apiKey)), value(token)) ++
             CheckSchemaDeployment(equalTo((apiUrl, token, orgId, environment, schemas.head)), value(true))
 
         assertM(command.process.provideCustomLayer(mockEnv))(equalTo(ExitCode.Success))

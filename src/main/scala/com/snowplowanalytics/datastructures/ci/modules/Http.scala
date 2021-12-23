@@ -2,14 +2,15 @@ package com.snowplowanalytics.datastructures.ci.modules
 
 import cats.syntax.either._
 import io.circe.{Json => CJson}
+import sttp.capabilities.WebSockets
+import sttp.capabilities.zio.ZioStreams
 import sttp.client3.asynchttpclient.zio.SttpClient
 import sttp.client3.circe.asJsonAlways
 import sttp.client3.{Request, SttpBackend}
 import zio._
+
 import com.snowplowanalytics.datastructures.ci.errors.CliError
 import com.snowplowanalytics.datastructures.ci.errors.CliError.Json.ParsingError
-import sttp.capabilities.zio.ZioStreams
-import sttp.capabilities.WebSockets
 
 object Http {
   type SttpRequest = Request[Either[String, String], Any]

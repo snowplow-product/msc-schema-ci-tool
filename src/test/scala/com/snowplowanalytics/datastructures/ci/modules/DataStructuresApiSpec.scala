@@ -25,7 +25,7 @@ object DataStructuresApiSpec extends DefaultRunnableSpec {
   private val hash: String          = "4d17d63e1acdb882757470f2be83a30e1dfc82c2e09519ed5fa5cc5e788bd3e2"
 
   private def matchRequest(env: String): Request[_, _] => Boolean = { r =>
-    r.uri.toString.startsWith(s"$apiBaseUrl/api/schemas/v1/organizations/$organizationId/schemas/$hash/deployments") &&
+    r.uri.toString.startsWith(s"$apiBaseUrl/organizations/$organizationId/data-structures/v1/$hash/deployments") &&
     r.uri.querySegments.contains(QuerySegment.KeyValue("env", env)) &&
     r.uri.querySegments.contains(QuerySegment.KeyValue("version", schemaKey.version)) &&
     r.headers.contains(Header.unsafeApply("Authorization", "Bearer token"))

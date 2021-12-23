@@ -108,7 +108,7 @@ object DataStructuresApi {
       }
 
       for {
-        uri         <- parseUri(s"$apiBaseUrl/api/schemas/v1/organizations/$organizationId/validation-requests/sync")
+        uri         <- parseUri(s"$apiBaseUrl/organizations/$organizationId/data-structures/v1/validation-requests")
         maybeErrors <- http.sendRequest(buildRequest(uri), extractEventualErrorsAndWarnings)
       } yield maybeErrors
     }
@@ -119,25 +119,19 @@ object DataStructuresApi {
         organizationId: UUID,
         environment: String,
         schemaMetadata: Schema.Key
-    ): IO[CliError, Boolean] = {
-      val basePath = s"$apiBaseUrl/api/schemas/v1"
-      val filters  = s"env=$environment&version=${schemaMetadata.version}"
-
-      val extractDeployments: CJson => List[CJson] =
-        _.hcursor.as[List[CJson]].getOrElse(List.empty)
-
+    ): IO[CliError, Boolean] =
       for {
         schemaHash  <- computeSchemaHash(organizationId, schemaMetadata)
-        uri         <- parseUri(s"$basePath/organizations/$organizationId/schemas/$schemaHash/deployments?$filters")
-        deployments <- http.sendRequest(basicRequest.auth.bearer(token).get(uri)).map(extractDeployments)
+        filters      = s"env=$environment&version=${schemaMetadata.version}"
+        uri         <- parseUri(s"$apiBaseUrl/organizations/$organizationId/data-structures/v1/$schemaHash/deployments?$filters")
+        request      = basicRequest.auth.bearer(token).get(uri)
+        deployments <- http.sendRequest(request).map(_.hcursor.as[List[CJson]].getOrElse(List.empty))
       } yield deployments.nonEmpty
-    }
 
     private def parseUri(uri: String): IO[CliError, Uri] =
       ZIO
-        .effect(Uri.parse(uri).leftMap(error => CliError.GenericError(s"Uri parsing error: $uri ($error)")))
+        .fromEither(Uri.parse(uri).leftMap(error => CliError.GenericError(s"Uri parsing error: $uri ($error)")))
         .mapError(CliError.GenericError(s"Uri parsing error: $uri", _))
-        .absolve
 
     private def computeSchemaHash(organizationId: UUID, meta: Schema.Key): IO[CliError, String] =
       ZIO

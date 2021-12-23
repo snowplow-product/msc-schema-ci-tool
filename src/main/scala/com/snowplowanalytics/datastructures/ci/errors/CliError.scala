@@ -19,8 +19,8 @@ object CliError {
 
   object Auth {
 
-    case object InvalidCredentials extends Auth {
-      override def message: String               = "Invalid user/client credentials"
+    case object InvalidApiKey extends Auth {
+      override def message: String               = "Invalid api key"
       override def underlying: Option[Throwable] = none
     }
 

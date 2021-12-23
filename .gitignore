@@ -24,6 +24,7 @@ project/plugins/project/
 
 ### Metals / Bloop ###
 .bloop/
+.bsp/
 .metals/
 
 ### Others

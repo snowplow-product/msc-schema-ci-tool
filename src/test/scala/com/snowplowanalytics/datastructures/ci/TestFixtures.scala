@@ -2,16 +2,17 @@ package com.snowplowanalytics.datastructures.ci
 
 import io.circe.parser.parse
 import io.circe.{Decoder, Encoder, Printer}
+import sttp.capabilities.WebSockets
+import sttp.capabilities.zio.ZioStreams
 import sttp.client3.asynchttpclient.zio.AsyncHttpClientZioBackend
 import sttp.client3.testing.SttpBackendStub
 import sttp.client3.{Request, Response, StringBody}
 import sttp.model.StatusCode.{BadRequest, NotFound}
 import sttp.model.{MediaType, Method}
 import zio.{Task, ULayer, ZLayer}
+
 import com.snowplowanalytics.datastructures.ci.modules.Http
 import com.snowplowanalytics.datastructures.ci.modules.Http.SttpImpl
-import sttp.capabilities.zio.ZioStreams
-import sttp.capabilities.WebSockets
 
 object TestFixtures {
 
@@ -29,7 +30,7 @@ object TestFixtures {
                 .flatMap(_.hcursor.as[A])
                 .map(answer.andThen(res => res.copy(body = Encoder[B].apply(res.body).printWith(Printer.noSpaces))))
                 .fold(_ => Response("{}", BadRequest), identity)
-            case _                                                          => Response("{}", BadRequest)
+            case _                                                    => Response("{}", BadRequest)
           }
         case _                                                 => Response("{}", NotFound)
       }

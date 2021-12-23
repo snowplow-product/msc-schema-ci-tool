@@ -3,19 +3,20 @@ package com.snowplowanalytics.datastructures.ci.modules
 import cats.syntax.either._
 import io.circe.literal._
 import io.circe.{Json => CJson}
+import sttp.capabilities.WebSockets
+import sttp.capabilities.zio.ZioStreams
 import sttp.client3._
 import sttp.client3.asynchttpclient.zio.AsyncHttpClientZioBackend
 import sttp.client3.testing.SttpBackendStub
-import zio.{Task, ZIO}
 import zio.test.Assertion._
 import zio.test._
 import zio.test.environment.TestEnvironment
+import zio.{Task, ZIO}
+
 import com.snowplowanalytics.datastructures.ci.TestFixtures._
 import com.snowplowanalytics.datastructures.ci.errors.CliError
 import com.snowplowanalytics.datastructures.ci.errors.CliError.Json.ParsingError
 import com.snowplowanalytics.datastructures.ci.modules.Http.sendRequest
-import sttp.capabilities.zio.ZioStreams
-import sttp.capabilities.WebSockets
 
 object HttpSpec extends DefaultRunnableSpec {
 

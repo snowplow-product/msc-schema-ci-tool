@@ -18,12 +18,12 @@ Currently, it supports one common task:
 You can download data-structures-ci using the following command:
 
 ```
-curl -L "https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/0.3.5/data_structures_ci_0.3.5.zip" | jar xv && chmod +x ./data-structures-ci
+curl -L "https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/1.0.0/data_structures_ci_1.0.0.zip" | jar xv 
 ```
 
-In order to be able to perform any task, you need to supply credentials of a user which you will use for CI purposes.
-These credentials come in form of a username and a password which can be obtained by creating an __admin__
-user for your organization from the dedicated Snowplow BDP Console page.
+In order to be able to perform any task, you will need to be a customer and supply both your Organization and 
+an API key, which you can generate from https://console.snowplowanalytics.com/<organization-id>/credentials.
+Those two should be provided as env vars.
 
 ## Usage
 
@@ -34,10 +34,10 @@ are already deployed into an environment (e.g. "DEV", "PROD")
 
 Syntax: 
 ```bash
+$ export ORGANIZATION_ID=<organization-id>
+$ export API_KEY=<api-key>
 $ ./data-structures-ci check \
     --manifestPath /path/to/manifest/snowplow-schemas.json \
-    --username <username> \
-    --password <password> \
     --environment DEV
 ```
 
@@ -65,7 +65,7 @@ An example of how a manifest looks like:
 [gh-actions]: https://github.com/snowplow-product/msc-schema-ci-tool/actions?query=workflow%3Aci
 
 [gh-release-image]: https://img.shields.io/github/downloads/snowplow-product/msc-schema-ci-tool/total
-[gh-release]: https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/0.3.5/data_structures_ci_0.3.5.zip
+[gh-release]: https://github.com/snowplow-product/msc-schema-ci-tool/releases/download/1.0.0/data_structures_ci_1.0.0.zip
 
 [license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
 [license]: http://www.apache.org/licenses/LICENSE-2.0

@@ -1,11 +1,13 @@
 package com.snowplowanalytics.datastructures.ci.commands
 
 import scala.io.Source
+
 import cats.data.NonEmptyList
 import cats.effect.ExitCode
 import cats.implicits._
 import zio._
 import zio.console._
+
 import com.snowplowanalytics.datastructures.ci._
 import com.snowplowanalytics.datastructures.ci.entities.Schema
 import com.snowplowanalytics.datastructures.ci.entities.Schema.Key._
@@ -17,14 +19,10 @@ import com.snowplowanalytics.datastructures.ci.modules.Jwt._
 
 case class CheckDeployments(
     manifestPath: String,
-    username: String,
-    password: String,
     environment: String,
     apiBaseUrl: URL,
-    authServerBaseUrl: URL,
-    clientId: String,
-    clientSecret: String,
-    audience: URL
+    organizationId: UUID,
+    apiKey: String
 ) extends CliSubcommand {
 
   override def process: CliTask[ExitCode] = {
@@ -50,9 +48,8 @@ case class CheckDeployments(
     for {
       schemas  <- extractSchemaDependenciesFromManifest(Source.fromFile(manifestPath))
       _        <- printInfo(schemas)
-      token    <- getAccessToken(authServerBaseUrl, clientId, clientSecret, audience, username, password)
-      orgId    <- extractOrganizationIdFromToken(authServerBaseUrl, token)
-      result   <- verifySchemaDeployment(apiBaseUrl, token, orgId, environment, schemas)
+      token    <- getAccessToken(apiBaseUrl, organizationId, apiKey)
+      result   <- verifySchemaDeployment(apiBaseUrl, token, organizationId, environment, schemas)
       exitCode <- result.fold(printSuccess.as(ExitCode.Success))(printError(_).as(ExitCode.Error))
     } yield exitCode
   }

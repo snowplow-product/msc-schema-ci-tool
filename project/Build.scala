@@ -17,19 +17,15 @@ object Build {
     val circe      = "0.14.1"
     val decline    = "1.4.0"
     val igluClient = "1.1.1"
-    val jwt        = "9.0.2"
-    val jwk        = "1.2.22"
   }
 
   val dependencies: Seq[ModuleID] = Seq(
     "dev.zio"                       %% "zio"                           % Versions.zio,
-    "dev.zio"                       %% "zio-macros"                    % Versions.zio,
     "dev.zio"                       %% "zio-interop-cats"              % (Versions.catsEffect + ".0"),
     "io.circe"                      %% "circe-core"                    % Versions.circe,
     "io.circe"                      %% "circe-generic"                 % Versions.circe,
     "io.circe"                      %% "circe-generic-extras"          % Versions.circe,
     "io.circe"                      %% "circe-parser"                  % Versions.circe,
-    "io.circe"                      %% "circe-literal"                 % Versions.circe,
     "org.typelevel"                 %% "cats-core"                     % Versions.cats,
     "org.typelevel"                 %% "cats-effect"                   % Versions.catsEffect,
     "com.softwaremill.sttp.client3" %% "core"                          % Versions.sttp,
@@ -44,10 +40,9 @@ object Build {
     "com.monovore"                  %% "decline-effect"                % Versions.decline,
     "com.monovore"                  %% "decline-refined"               % Versions.decline,
     "com.snowplowanalytics"         %% "iglu-scala-client"             % Versions.igluClient,
-    "com.github.jwt-scala"          %% "jwt-circe"                     % Versions.jwt,
-    "com.chatwork"                  %% "scala-jwk"                     % Versions.jwk,
-    "dev.zio"                       %% "zio-test"                      % Versions.zio % "test",
-    "dev.zio"                       %% "zio-test-sbt"                  % Versions.zio % "test",
+    "dev.zio"                       %% "zio-test"                      % Versions.zio   % Test,
+    "dev.zio"                       %% "zio-test-sbt"                  % Versions.zio   % Test,
+    "io.circe"                      %% "circe-literal"                 % Versions.circe % Test,
     "org.slf4j"                      % "slf4j-nop"                     % "1.7.30",
     compilerPlugin("org.typelevel" %% "kind-projector"     % "0.13.2" cross CrossVersion.full),
     compilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1"),
@@ -75,7 +70,7 @@ object Build {
   lazy val sbtAssemblySettings: Seq[Setting[_]] = Seq(
     assembly / assemblyJarName := name.value,
     assembly / mainClass := Some("com.snowplowanalytics.datastructures.ci.Main"),
-    assembly / assemblyOption ~= { _.copy(prependShellScript = Some(defaultShellScript)) },
+    assembly / assemblyOption ~= { _.withPrependShellScript(defaultShellScript) },
     crossPaths := false,
     assembly / test := {},
     assembly / assemblyMergeStrategy := {
@@ -88,9 +83,7 @@ object Build {
     buildInfoKeys := Seq[BuildInfoKey](
       name,
       version,
-      description,
-      "cid" -> sys.env("SNOWPLOW_API_CLIENT_ID"),
-      "cs"  -> sys.env("SNOWPLOW_API_CLIENT_SECRET")
+      description
     ),
     buildInfoPackage := "com.snowplowanalytics.datastructures.ci"
   )
